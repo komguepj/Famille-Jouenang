@@ -199,11 +199,12 @@ window.FAMILY_DATA = {
       "prenom": "Brice",
       "nom": "Piegouong",
       "sexe": "M",
-      "moisNaissance": null,
+      "moisNaissance": 9,
       "anneeNaissance": null,
       "photo": "",
       "familleId": "famille-gilbert-gilbert-epouse",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": 2
     },
     {
       "id": "gilbert-enfant-4",
@@ -646,14 +647,15 @@ window.FAMILY_DATA = {
     },
     {
       "id": "nadege-enfant-1",
-      "prenom": "Enfant 1 de Nadège",
-      "nom": "",
+      "prenom": "Cécile Laure",
+      "nom": "Ngopnang Mouaffo",
       "sexe": "",
-      "moisNaissance": null,
+      "moisNaissance": 9,
       "anneeNaissance": null,
       "photo": "",
       "familleId": "famille-nadege-epoux-nadege",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": 11
     },
     {
       "id": "nadege-enfant-2",
@@ -704,11 +706,12 @@ window.FAMILY_DATA = {
       "prenom": "Alvine",
       "nom": "Guenang",
       "sexe": "F",
-      "moisNaissance": null,
+      "moisNaissance": 9,
       "anneeNaissance": null,
       "photo": "photos/alvine.jpg",
       "familleId": "famille-abel-cecile",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": 1
     },
     {
       "id": "alvine-epoux",
