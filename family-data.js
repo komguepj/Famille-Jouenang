@@ -133,9 +133,11 @@ window.FAMILY_DATA = {
       "sexe": "M",
       "moisNaissance": null,
       "anneeNaissance": null,
-      "photo": "photos/abel.jpg",
+      "photo": "photos/Abel.JPG",
       "familleId": null,
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": null,
+      "rangNaissance": null
     },
     {
       "id": "martine",
@@ -248,9 +250,11 @@ window.FAMILY_DATA = {
       "sexe": "M",
       "moisNaissance": null,
       "anneeNaissance": null,
-      "photo": "photos/jean-lebel.jpg",
+      "photo": "photos/Lebel.JPG",
       "familleId": "famille-abel-martine",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": null,
+      "rangNaissance": null
     },
     {
       "id": "jean-lebel-epouse",
@@ -556,9 +560,11 @@ window.FAMILY_DATA = {
       "sexe": "M",
       "moisNaissance": null,
       "anneeNaissance": null,
-      "photo": "photos/alain.jpg",
+      "photo": "photos/Padre.JPG",
       "familleId": "famille-abel-cecile",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": null,
+      "rangNaissance": null
     },
     {
       "id": "valerie",
@@ -634,9 +640,11 @@ window.FAMILY_DATA = {
       "sexe": "F",
       "moisNaissance": null,
       "anneeNaissance": null,
-      "photo": "photos/nadege.jpg",
+      "photo": "photos/Nadège.JPG",
       "familleId": "famille-abel-cecile",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": null,
+      "rangNaissance": null
     },
     {
       "id": "nadege-epoux",
@@ -715,7 +723,8 @@ window.FAMILY_DATA = {
       "photo": "photos/alvine.jpg",
       "familleId": "famille-abel-cecile",
       "grandeFamilleId": "jouenang",
-      "jourNaissance": 1
+      "jourNaissance": 1,
+      "rangNaissance": null
     },
     {
       "id": "alvine-epoux",
