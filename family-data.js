@@ -499,7 +499,8 @@ window.FAMILY_DATA = {
       "photo": "",
       "familleId": "famille-jules-jules-epouse",
       "grandeFamilleId": "jouenang",
-      "jourNaissance": 17
+      "jourNaissance": 17,
+      "rangNaissance": 1
     },
     {
       "id": "jules-enfant-2",
@@ -510,7 +511,8 @@ window.FAMILY_DATA = {
       "anneeNaissance": null,
       "photo": "",
       "familleId": "famille-jules-jules-epouse",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "rangNaissance": 2
     },
     {
       "id": "jules-enfant-3",
@@ -521,7 +523,8 @@ window.FAMILY_DATA = {
       "anneeNaissance": null,
       "photo": "",
       "familleId": "famille-jules-jules-epouse",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "rangNaissance": 3
     },
     {
       "id": "jules-enfant-4",
@@ -532,7 +535,8 @@ window.FAMILY_DATA = {
       "anneeNaissance": null,
       "photo": "",
       "familleId": "famille-jules-jules-epouse",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "rangNaissance": 4
     },
     {
       "id": "cecile",
