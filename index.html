@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plusieurs Branches, une Même Racine</title>
+<meta name="description" content="Site familial — familles, fiches et arbres généalogiques.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#1E7A4D; --bg-deep-2:#14582F; --bg-card:rgba(10,52,28,0.55);
+  --ivory:#FFFBF0; --parchment:#FFF3D6; --parchment-2:#F4E3B8;
+  --gold:#F4B942; --gold-light:#FFD873; --wood:#B5652F; --wood-light:#E8935A;
+  --sage:#2E9B63; --sage-light:#7FE0A8; --ink:#16311F; --danger:#FF8A7A;
+  --shadow:rgba(9,41,23,0.4); --line:rgba(255,243,214,0.18);
+  --font-display:"Fraunces","Iowan Old Style",Georgia,serif;
+  --font-body:"Work Sans","Segoe UI",system-ui,sans-serif;
+  --font-label:"Space Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,var(--bg-deep-2),var(--bg-deep) 70%) fixed;background-color:var(--bg-deep-2);color:var(--ivory);font-family:var(--font-body);-webkit-font-smoothing:antialiased;line-height:1.45}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit}
+:focus-visible{outline:3px solid var(--gold-light);outline-offset:3px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+.hidden{display:none!important}
+
+/* avatars */
+.avatar{position:relative;display:inline-flex;align-items:center;justify-content:center;flex:none;width:var(--sz,64px);height:var(--sz,64px);border-radius:50%;overflow:hidden;background:var(--bg-deep-2);box-shadow:0 4px 14px var(--shadow);border:2px solid var(--ring,var(--wood-light))}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.avatar .ini{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:600;font-size:calc(var(--sz,64px) * .36);color:var(--ink);background:var(--avatar-color,var(--gold))}
+.avatar.m{--ring:var(--sage-light)} .avatar.f{--ring:var(--wood-light)}
+
+.eyebrow{font-family:var(--font-label);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--sage-light)}
+.chip{display:inline-flex;align-items:center;gap:.35rem;font-family:var(--font-label);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;padding:.28rem .65rem;border-radius:999px;border:1px solid rgba(244,185,66,.45);color:var(--gold-light);background:rgba(244,185,66,.08);white-space:nowrap}
+a.chip:hover{background:rgba(244,185,66,.2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;padding:.6rem 1.1rem;border-radius:10px;border:1px solid rgba(255,216,115,.4);background:linear-gradient(160deg,var(--wood-light),var(--wood));color:var(--ivory);font-weight:600;cursor:pointer;box-shadow:0 6px 18px var(--shadow);transition:transform .2s,border-color .2s}
+.btn:hover{transform:translateY(-2px);border-color:var(--gold-light)}
+.btn.ghost{background:transparent;box-shadow:none;border-color:rgba(255,243,214,.35);color:var(--parchment)}
+.btn.ghost:hover{border-color:var(--gold-light);color:var(--gold-light)}
+.btn:disabled{opacity:.35;cursor:default;transform:none}
+.btn.small{padding:.35rem .7rem;font-size:.85rem;border-radius:8px}
+.btn.danger{background:transparent;border-color:rgba(255,138,122,.5);color:var(--danger);box-shadow:none}
+.badge-deduit{font-family:var(--font-label);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;padding:.08rem .38rem;border-radius:4px;background:rgba(127,224,168,.14);color:var(--sage-light);margin-left:.3rem;vertical-align:middle}
+
+
+/* ---------- En-tête ---------- */
+.site-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 1.25rem;background:rgba(20,88,47,.92);border-bottom:1px solid rgba(244,185,66,.3);position:sticky;top:0;z-index:30;backdrop-filter:blur(6px)}
+.site-header .brand{font-family:var(--font-display);font-weight:600;font-size:1.02rem;color:var(--gold-light)}
+.site-header nav{display:flex;gap:.5rem;flex-wrap:wrap}
+.preview-bar{background:var(--gold);color:var(--ink);text-align:center;font-family:var(--font-label);font-size:.75rem;padding:.4rem 1rem}
+
+/* ---------- Accueil ---------- */
+.hero{position:relative;overflow:hidden;text-align:center;padding:4.5rem 1.25rem 2.5rem}
+.hero svg{position:absolute;inset:0;width:100%;height:100%;opacity:.4;pointer-events:none}
+.hero svg path{fill:none;stroke:var(--wood-light);stroke-width:1.4;stroke-linecap:round;stroke-dasharray:700;stroke-dashoffset:700;animation:grow 3.2s ease-out forwards}
+.hero svg path.sage{stroke:var(--sage-light)}
+@keyframes grow{to{stroke-dashoffset:0}}
+.hero-inner{position:relative;max-width:760px;margin:0 auto}
+.hero h1{font-family:var(--font-display);font-weight:600;font-size:clamp(2.1rem,6vw,3.7rem);line-height:1.1;margin:.8rem 0 1rem;background:linear-gradient(180deg,var(--ivory),var(--gold-light));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--parchment);font-size:1.05rem;margin:0}
+
+.toolbar{max-width:1240px;margin:0 auto;padding:0 1.25rem 1.2rem;display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;justify-content:space-between}
+.filters{display:flex;flex-wrap:wrap;gap:.45rem}
+.filters button{cursor:pointer;background:transparent}
+.filters button.on{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+.search{flex:0 1 280px;min-width:0;padding:.6rem .9rem;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.18);color:var(--ivory)}
+.search::placeholder{color:rgba(255,243,214,.5)}
+
+.gf-strip{max-width:1240px;margin:0 auto 1.6rem;padding:0 1.25rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.8rem}
+.gf-card{display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding:.9rem 1.1rem;border-radius:14px;border:1px solid rgba(244,185,66,.35);background:linear-gradient(135deg,rgba(181,101,47,.28),rgba(20,88,47,.4));transition:transform .2s}
+.gf-card:hover{transform:translateY(-2px);border-color:var(--gold-light)}
+.gf-card strong{font-family:var(--font-display);font-size:1.15rem;display:block}
+.gf-card small{color:var(--parchment-2);font-size:.8rem}
+.gf-card .go{font-family:var(--font-label);font-size:.7rem;color:var(--gold-light);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+
+.grid{max-width:1240px;margin:0 auto;padding:0 1.25rem 3rem}
+.grid-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1.1rem;align-items:start}
+.grid-row.roots{display:flex;flex-wrap:wrap;justify-content:center;gap:1.1rem;margin-bottom:1.1rem;padding-bottom:1.3rem;border-bottom:1px dashed rgba(244,185,66,.35)}
+.grid-row.roots .fcard{border-color:rgba(244,185,66,.45);width:min(100%,420px)}
+.grid-row.roots .fcard.merged{width:min(100%,900px)}
+.grid-row:not(.roots) .fcard.merged{grid-column:1/-1}
+.couple.multi{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:.3rem 1.2rem}
+.couple.multi .parent{width:150px}
+.family-page .couple.multi{max-width:none}
+.kids-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.4rem 1.4rem}
+.kids h4{margin:.2rem 0 .35rem;font-family:var(--font-label);font-weight:400;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--sage-light)}
+.sub-title{font-family:var(--font-label);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sage-light);margin:1.2rem 0 .6rem;text-align:center}
+.fcard{background:var(--bg-card);border:1px solid var(--line);border-radius:18px;padding:1.1rem 1.1rem 1rem;box-shadow:0 10px 30px rgba(9,41,23,.25);display:flex;flex-direction:column;gap:.9rem;aspect-ratio:auto}
+.fcard-head{display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem}
+.fcard-head h2{font-family:var(--font-display);font-weight:600;font-size:1.2rem;margin:0;line-height:1.2}
+.fcard-head h2 a:hover{color:var(--gold-light)}
+.couple{display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:.3rem}
+.couple .heart{color:var(--gold);font-size:1.1rem;margin-top:30px}
+.parent{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.35rem;padding:.3rem;border-radius:12px;transition:background .2s}
+a.parent:hover{background:rgba(255,243,214,.07)}
+.parent .role{font-family:var(--font-label);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sage-light)}
+.parent .name{font-family:var(--font-display);font-weight:600;font-size:.95rem;line-height:1.2}
+.parent.unknown{opacity:.55}
+.solo{display:flex;justify-content:center;padding:.4rem 0}
+.solo .parent .name{font-size:1.05rem}
+.family-page .solo{margin-bottom:1.5rem}
+.kids{border-top:1px dashed var(--line);padding-top:.7rem}
+.kids h3{margin:0 0 .45rem;font-family:var(--font-label);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-light);font-weight:400}
+.kids ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.15rem}
+.kids li a{display:flex;align-items:center;gap:.55rem;padding:.25rem .35rem;border-radius:8px}
+.kids li a:hover{background:rgba(255,243,214,.07)}
+.kids li .yr{margin-left:auto;font-family:var(--font-label);font-size:.68rem;color:var(--parchment-2);opacity:.75}
+.kids li .plus{font-size:.7rem;color:var(--gold-light)}
+.kids .none{font-size:.85rem;color:var(--parchment-2);opacity:.7;margin:0}
+.empty{max-width:520px;margin:2rem auto 4rem;text-align:center;padding:1.6rem;border:1px dashed rgba(255,243,214,.3);border-radius:14px;color:var(--parchment-2)}
+.empty strong{color:var(--gold-light)}
+
+/* ---------- Titres de page ---------- */
+.page-head{text-align:center;padding:2.6rem 1.25rem 1.2rem}
+.page-head h1{font-family:var(--font-display);font-weight:600;font-size:clamp(1.7rem,4.2vw,2.6rem);margin:.4rem 0 .4rem}
+.page-head p{margin:0;color:var(--parchment-2)}
+.page-head .actions{margin-top:1rem;display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap}
+
+/* ---------- Fiche personne ---------- */
+.person{max-width:1000px;margin:0 auto;padding:2rem 1.25rem 3rem;display:grid;grid-template-columns:300px 1fr;gap:1.5rem;align-items:start}
+.idcard{background:var(--bg-card);border:1px solid var(--line);border-radius:18px;padding:1.6rem 1.3rem;text-align:center;position:sticky;top:80px}
+.idcard h1{font-family:var(--font-display);font-weight:600;font-size:1.6rem;margin:.9rem 0 .2rem;line-height:1.15}
+.idcard dl{text-align:left;margin:1.2rem 0 0;display:grid;grid-template-columns:auto 1fr;gap:.45rem .8rem;font-size:.92rem}
+.idcard dt{font-family:var(--font-label);font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--sage-light);padding-top:.2rem}
+.idcard dd{margin:0}
+.idcard dd a{color:var(--gold-light);border-bottom:1px dotted rgba(255,216,115,.5)}
+.rels{display:flex;flex-direction:column;gap:1rem}
+.relgroup{background:var(--bg-card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem}
+.relgroup h2{margin:0 0 .7rem;font-family:var(--font-label);font-weight:400;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-light)}
+.relgroup ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.4rem}
+.relgroup a{display:flex;align-items:center;gap:.6rem;padding:.35rem .45rem;border-radius:10px}
+.relgroup a:hover{background:rgba(255,243,214,.07)}
+.relgroup .who{display:flex;flex-direction:column;min-width:0}
+.relgroup .who b{font-weight:600;font-size:.93rem;overflow:hidden;text-overflow:ellipsis}
+.relgroup .who span{font-size:.78rem;color:var(--sage-light)}
+.legend{font-size:.8rem;color:var(--parchment-2);opacity:.8;margin:0}
+
+/* ---------- Page famille ---------- */
+.family-page{max-width:900px;margin:0 auto;padding:0 1.25rem 3rem}
+.family-page .couple{max-width:520px;margin:0 auto 1.5rem}
+.kid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem}
+.kid-grid a{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.4rem;padding:.9rem .5rem;border-radius:14px;background:var(--bg-card);border:1px solid var(--line)}
+.kid-grid a:hover{border-color:var(--gold-light)}
+.kid-grid b{font-family:var(--font-display);font-weight:600;font-size:.95rem;line-height:1.2}
+.kid-grid small{font-size:.75rem;color:var(--parchment-2)}
+.section-title{font-family:var(--font-label);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-light);margin:0 0 .8rem;text-align:center}
+
+/* ---------- Arbre ---------- */
+.tree-tools{display:flex;justify-content:center;gap:.4rem;padding:0 1.25rem .8rem;flex-wrap:wrap}
+.tree-wrap{overflow:auto;padding:1rem 1.25rem 3rem;-webkit-overflow-scrolling:touch}
+.tree{display:flex;justify-content:center;min-width:max-content;margin:0 auto}
+.tree ul{position:relative;display:flex;justify-content:center;margin:0;padding:22px 0 0}
+.tree>ul{padding-top:0}
+.tree li{position:relative;list-style:none;display:flex;flex-direction:column;align-items:center;padding:22px 5px 0}
+.tree>ul>li{padding-top:0}
+.tree li::before,.tree li::after{content:"";position:absolute;top:0;right:50%;width:50%;height:22px;border-top:2px solid var(--wood-light)}
+.tree li::after{right:auto;left:50%;border-left:2px solid var(--wood-light)}
+.tree li:only-child::before,.tree li:only-child::after{display:none}
+.tree li:only-child{padding-top:22px}
+.tree>ul>li:only-child{padding-top:0}
+.tree li:only-child>.tnode::before{content:"";position:absolute;top:-22px;left:50%;height:22px;border-left:2px solid var(--wood-light)}
+.tree>ul>li>.tnode::before{display:none}
+.tree li:first-child::before,.tree li:last-child::after{border:0 none}
+.tree li:last-child::before{border-right:2px solid var(--wood-light);border-radius:0 8px 0 0}
+.tree li:first-child::after{border-radius:8px 0 0 0}
+.tree ul ul::before{content:"";position:absolute;top:0;left:50%;height:22px;border-left:2px solid var(--wood-light)}
+.tree ul.unions>li::before,.tree ul.unions>li::after,.tree ul.unions::before{border-color:var(--gold)}
+.tnode{position:relative;display:inline-flex;align-items:flex-start;gap:.2rem;padding:.45rem .5rem;border-radius:14px;background:rgba(10,52,28,.6);border:1px solid var(--line)}
+.tnode .heart{color:var(--gold);align-self:center;font-size:.85rem;padding:0 .1rem}
+.tperson{display:flex;flex-direction:column;align-items:center;gap:.25rem;width:96px;padding:.2rem;border-radius:10px;text-align:center}
+.tperson:hover{background:rgba(255,243,214,.08)}
+.tperson b{font-family:var(--font-display);font-weight:600;font-size:.8rem;line-height:1.15}
+.tperson small{font-family:var(--font-label);font-size:.6rem;color:var(--parchment-2);opacity:.8}
+.tperson.focus{background:rgba(255,216,115,.18);box-shadow:0 0 0 2px var(--gold-light)}
+.tperson.unknown{opacity:.5}
+.toggle{position:absolute;bottom:-11px;left:50%;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;border:1px solid var(--gold);background:var(--bg-deep-2);color:var(--gold-light);font-size:.8rem;line-height:1;cursor:pointer;z-index:2;padding:0}
+li.collapsed>ul{display:none}
+.union-label{font-family:var(--font-label);font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-light);display:block;margin-bottom:.1rem}
+
+/* ---------- Navigation ---------- */
+.site-header nav a.on{border-color:var(--gold-light);color:var(--gold-light)}
+
+/* ---------- Accueil : anniversaires & nouvelles ---------- */
+/* Mise en page accueil : familles au centre, anniversaires & nouvelles sur le côté (grand écran) ou en bas */
+.home-layout{max-width:1560px;margin:0 auto;padding:0 1.25rem 3rem;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:1.4rem;align-items:start}
+.home-main .toolbar,.home-main .grid{max-width:none;padding-left:0;padding-right:0}
+.home-main .grid{padding-bottom:0}
+.home-side{position:sticky;top:84px;max-height:calc(100vh - 100px);overflow:auto;scrollbar-width:thin}
+.teasers{display:flex;flex-direction:column;gap:1rem}
+@media (max-width:1100px){
+  .home-layout{grid-template-columns:1fr}
+  .home-side{position:static;max-height:none;overflow:visible;border-top:1px dashed rgba(244,185,66,.35);padding-top:1.4rem}
+  .teasers{display:grid;grid-template-columns:1fr 1.4fr}
+}
+.teaser{background:var(--bg-card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem}
+.teaser h2{margin:0 0 .7rem;font-family:var(--font-display);font-weight:600;font-size:1.1rem;display:flex;justify-content:space-between;align-items:baseline;gap:.5rem}
+.teaser h2 a{font-family:var(--font-label);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-light);font-weight:400;white-space:nowrap}
+.teaser .muted{color:var(--parchment-2);opacity:.8;font-size:.9rem;margin:0}
+.bday-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.2rem}
+.bday-list a{display:flex;align-items:center;gap:.6rem;padding:.3rem .35rem;border-radius:8px}
+.bday-list a:hover{background:rgba(255,243,214,.07)}
+.bday-list .when{margin-left:auto;font-family:var(--font-label);font-size:.7rem;color:var(--gold-light);text-align:right;white-space:nowrap}
+.bday-list .when small{display:block;color:var(--parchment-2);opacity:.8}
+.news-mini{display:flex;flex-direction:column;gap:.6rem}
+.news-mini a{display:flex;gap:.8rem;align-items:center;padding:.3rem;border-radius:10px}
+.news-mini a:hover{background:rgba(255,243,214,.07)}
+.news-mini .thumb{width:84px;height:62px;flex:none;border-radius:8px;overflow:hidden;background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;color:var(--gold-light)}
+.news-mini .thumb img{width:100%;height:100%;object-fit:cover}
+.news-mini b{display:block;font-family:var(--font-display);font-weight:600}
+.news-mini small{color:var(--parchment-2);font-size:.78rem}
+
+/* ---------- Calendrier ---------- */
+.cal{max-width:1240px;margin:0 auto;padding:0 1.25rem 3rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1rem;align-items:start}
+.month{background:var(--bg-card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem}
+.month.now{border-color:var(--gold);box-shadow:0 0 0 3px rgba(244,185,66,.18)}
+.month h2{margin:0 0 .6rem;font-family:var(--font-display);font-weight:600;font-size:1.15rem;display:flex;justify-content:space-between;align-items:center}
+.month h2 span{font-family:var(--font-label);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);background:var(--gold);padding:.15rem .45rem;border-radius:5px;font-weight:400}
+.month .none{color:var(--parchment-2);opacity:.6;font-size:.85rem;margin:0}
+.cal-note{max-width:760px;margin:0 auto 2rem;padding:0 1.25rem;text-align:center;color:var(--parchment-2);font-size:.88rem}
+
+/* ---------- Nouvelles ---------- */
+.news{max-width:900px;margin:0 auto;padding:0 1.25rem 3rem;display:flex;flex-direction:column;gap:1.2rem}
+.post{background:var(--bg-card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.post-body{padding:1.1rem 1.3rem 1.2rem}
+.post h2{margin:.2rem 0 .5rem;font-family:var(--font-display);font-weight:600;font-size:1.35rem;line-height:1.2}
+.post h2 a:hover{color:var(--gold-light)}
+.post .date{font-family:var(--font-label);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sage-light)}
+.post .txt{color:var(--parchment);margin:0 0 .8rem;white-space:pre-line}
+.post .more{font-family:var(--font-label);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-light)}
+.tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem}
+.tags a{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .55rem .2rem .2rem;border-radius:999px;background:rgba(255,243,214,.07);font-size:.82rem}
+.tags a:hover{background:rgba(255,243,214,.15)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:4px;background:rgba(0,0,0,.2)}
+.gallery.cover{grid-template-columns:repeat(var(--n,1),1fr)}
+.gallery button{position:relative;padding:0;border:0;background:#0d3d22;cursor:zoom-in;aspect-ratio:4/3;overflow:hidden;display:block;width:100%}
+.gallery.cover.n1 button{aspect-ratio:16/8}
+.gallery img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.gallery button:hover img{transform:scale(1.04)}
+.gallery .plusn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(5,25,14,.6);font-family:var(--font-display);font-size:1.6rem;color:var(--ivory)}
+.gallery .cap{position:absolute;left:0;right:0;bottom:0;padding:.35rem .5rem;font-size:.75rem;text-align:left;background:linear-gradient(transparent,rgba(0,0,0,.7));color:var(--ivory)}
+.imgmiss{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:.5rem;font-family:var(--font-label);font-size:.62rem;color:var(--parchment-2);text-align:center;word-break:break-all}
+.lightbox{position:fixed;inset:0;z-index:100;background:rgba(3,15,8,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem}
+.lightbox img{max-width:100%;max-height:calc(100vh - 120px);object-fit:contain;border-radius:6px}
+.lightbox p{color:var(--parchment);margin:.8rem 0 0;text-align:center}
+.lightbox button{position:absolute;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:50%;width:46px;height:46px;font-size:1.3rem;cursor:pointer}
+.lightbox .lb-x{top:14px;right:14px}.lightbox .lb-p{left:14px;top:50%}.lightbox .lb-n{right:14px;top:50%}
+
+.site-footer{text-align:center;padding:2rem 1.25rem 3rem;font-family:var(--font-label);font-size:.68rem;letter-spacing:.08em;color:rgba(255,243,214,.45)}
+.site-footer a{border-bottom:1px dotted}
+
+.loadbox{max-width:560px;margin:5rem auto;padding:2rem;text-align:center;background:var(--bg-card);border:1px solid var(--line);border-radius:18px}
+.loadbox h1{font-family:var(--font-display);font-weight:600}
+.loadbox code{background:rgba(0,0,0,.25);padding:.1rem .35rem;border-radius:4px}
+
+@media (max-width:760px){
+  .person{grid-template-columns:1fr}
+  .idcard{position:static}
+  .site-header .brand{font-size:.9rem}
+  .toolbar{flex-direction:column;align-items:stretch}
+  .search{flex:1 1 auto}
+  .teasers{grid-template-columns:1fr !important}
+  .site-header{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<div id="app"><div class="loadbox"><p class="eyebrow">Chargement…</p></div></div>
+
+<script>
+/* ==========================================================
+   MOTEUR DE PARENTÉ — partagé par index.html et admin.html
+   ----------------------------------------------------------
+   Toutes les relations sont ramenées à un "chemin" (u, d) :
+   depuis X, monter de u générations jusqu'à un ancêtre commun,
+   puis descendre de d générations pour atteindre Y.
+     (1,0) parent        (0,1) enfant        (1,1) frère/sœur
+     (2,0) grand-parent  (0,2) petit-enfant  (2,1) oncle/tante
+     (1,2) neveu/nièce   (2,2) cousin(e)     etc.
+   Les déductions composent ces chemins selon des règles sûres
+   (voir composer()). La belle-famille est ensuite calculée à
+   partir des conjoints.
+   ========================================================== */
+var Genea = (function(){
+
+  // "A est <type> de B"  →  chemin de B vers A
+  var REL_TYPES = {
+    "parent":               { label: "Père / Mère",                 u: 1, d: 0 },
+    "enfant":               { label: "Fils / Fille",                u: 0, d: 1 },
+    "fratrie":              { label: "Frère / Sœur",                u: 1, d: 1, sib: true },
+    "grand-parent":         { label: "Grand-père / Grand-mère",     u: 2, d: 0 },
+    "petit-enfant":         { label: "Petit-fils / Petite-fille",   u: 0, d: 2 },
+    "oncle":                { label: "Oncle / Tante",               u: 2, d: 1 },
+    "neveu":                { label: "Neveu / Nièce",               u: 1, d: 2 },
+    "cousin":               { label: "Cousin / Cousine",            u: 2, d: 2 },
+    "grand-oncle":          { label: "Grand-oncle / Grand-tante",   u: 3, d: 1 },
+    "petit-neveu":          { label: "Petit-neveu / Petite-nièce",  u: 1, d: 3 },
+    "arriere-grand-parent": { label: "Arrière-grand-parent",        u: 3, d: 0 },
+    "arriere-petit-enfant": { label: "Arrière-petit-enfant",        u: 0, d: 3 },
+    "conjoint":             { label: "Mari / Épouse",               spouse: true },
+    "beau-frere":           { label: "Beau-frère / Belle-sœur",     direct: ["Beau-frère","Belle-sœur"], inverse: "beau-frere" },
+    "beau-parent":          { label: "Beau-père / Belle-mère",      direct: ["Beau-père","Belle-mère"], inverse: "gendre" },
+    "gendre":               { label: "Gendre / Belle-fille",        direct: ["Gendre","Belle-fille"], inverse: "beau-parent" }
+  };
+
+  var MAX_GEN = 6;
+  var MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+
+  function g(sex, m, f){
+    if(sex === "M") return m;
+    if(sex === "F") return f;
+    return m + " / " + f;
+  }
+  function arr(k){ var s = ""; for(var i = 0; i < k; i++) s += "arrière-"; return s; }
+  function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  // Libellé de Y vu depuis X (chemin u,d), selon le sexe de Y
+  function bloodLabel(u, d, sex, demi){
+    var s;
+    if(d === 0){
+      if(u === 1) s = g(sex, "père", "mère");
+      else if(u === 2) s = g(sex, "grand-père", "grand-mère");
+      else s = arr(u - 2) + g(sex, "grand-père", "grand-mère");
+    }else if(u === 0){
+      if(d === 1) s = g(sex, "fils", "fille");
+      else if(d === 2) s = g(sex, "petit-fils", "petite-fille");
+      else s = arr(d - 2) + g(sex, "petit-fils", "petite-fille");
+    }else if(u === 1 && d === 1){
+      s = (demi ? "demi-" : "") + g(sex, "frère", "sœur");
+    }else if(d === 1){
+      if(u === 2) s = g(sex, "oncle", "tante");
+      else if(u === 3) s = g(sex, "grand-oncle", "grand-tante");
+      else s = arr(u - 3) + g(sex, "grand-oncle", "grand-tante");
+    }else if(u === 1){
+      if(d === 2) s = g(sex, "neveu", "nièce");
+      else if(d === 3) s = g(sex, "petit-neveu", "petite-nièce");
+      else s = arr(d - 3) + g(sex, "petit-neveu", "petite-nièce");
+    }else if(u === d){
+      if(u === 2) s = g(sex, "cousin germain", "cousine germaine");
+      else if(u === 3) s = g(sex, "cousin issu de germain", "cousine issue de germain");
+      else s = g(sex, "cousin", "cousine") + " au " + (u - 1) + "e degré";
+    }else if(u - d === 1){
+      s = g(sex, "oncle", "tante") + " à la mode de Bretagne";
+    }else if(d - u === 1){
+      s = g(sex, "neveu", "nièce") + " à la mode de Bretagne";
+    }else{
+      s = g(sex, "cousin éloigné", "cousine éloignée");
+    }
+    return cap(s);
+  }
+
+  function category(u, d){
+    if(d === 0) return u === 1 ? "parents" : "ancetres";
+    if(u === 0) return d === 1 ? "enfants" : "descendants";
+    if(u === 1 && d === 1) return "fratrie";
+    if(d === 1) return "oncles";
+    if(u === 1) return "neveux";
+    return "cousins";
+  }
+
+  var CATEGORIES = [
+    ["parents", "Parents"], ["conjoints", "Conjoint(s)"], ["fratrie", "Frères & sœurs"],
+    ["enfants", "Enfants"], ["ancetres", "Grands-parents & aïeux"], ["descendants", "Petits-enfants & descendance"],
+    ["oncles", "Oncles & tantes"], ["neveux", "Neveux & nièces"], ["cousins", "Cousins & cousines"],
+    ["alliance", "Belle-famille"]
+  ];
+
+  function slug(str){
+    return String(str || "").normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "x";
+  }
+
+  function fullName(p){
+    if(!p) return "?";
+    return [p.prenom, p.nom].filter(Boolean).join(" ") || "(sans nom)";
+  }
+
+  function birthText(p){
+    if(!p || (!p.anneeNaissance && !p.moisNaissance)) return "";
+    var parts = [];
+    if(p.moisNaissance && p.jourNaissance) parts.push(p.jourNaissance === 1 ? "1er" : String(p.jourNaissance));
+    if(p.moisNaissance) parts.push(MOIS[p.moisNaissance - 1]);
+    if(p.anneeNaissance) parts.push(String(p.anneeNaissance));
+    return parts.join(" ");
+  }
+  // "2026-09-12" → "12 septembre 2026"
+  function dateText(iso){
+    var m = /^(\d{4})-(\d{2})(?:-(\d{2}))?$/.exec(iso || "");
+    if(!m) return iso || "";
+    var d = m[3] ? +m[3] : 0;
+    return (d ? (d === 1 ? "1er " : d + " ") : "") + MOIS[+m[2] - 1] + " " + m[1];
+  }
+
+  /* ------------------------------------------------------
+     Construction du modèle
+     ------------------------------------------------------ */
+  function build(data){
+    data = data || {};
+    var personnes = data.personnes || [];
+    var familles = data.familles || [];
+    var grandes = data.grandesFamilles || [];
+    var relations = data.relations || [];
+
+    var P = {}, F = {}, GF = {};
+    personnes.forEach(function(p){ P[p.id] = p; });
+    familles.forEach(function(f){ F[f.id] = f; });
+    grandes.forEach(function(gf){ GF[gf.id] = gf; });
+
+    var parentsOf = {}, childrenOf = {}, spousesOf = {}, adj = {};
+    personnes.forEach(function(p){ parentsOf[p.id] = []; childrenOf[p.id] = []; spousesOf[p.id] = []; adj[p.id] = []; });
+
+    function pushUniq(arr, v){ if(arr.indexOf(v) < 0) arr.push(v); }
+    function addParent(child, parent){
+      if(!P[child] || !P[parent] || child === parent) return;
+      pushUniq(parentsOf[child], parent);
+      pushUniq(childrenOf[parent], child);
+    }
+    function addSpouse(a, b){
+      if(!P[a] || !P[b] || a === b) return;
+      pushUniq(spousesOf[a], b); pushUniq(spousesOf[b], a);
+    }
+    // arête de x vers y : chemin (u,d) de x jusqu'à y
+    function addEdge(x, y, u, d, sib, src){
+      if(!P[x] || !P[y] || x === y) return;
+      adj[x].push({ to: y, u: u, d: d, sib: !!sib, src: src });
+      adj[y].push({ to: x, u: d, d: u, sib: !!sib, src: src });
+    }
+
+    // 1. Structure issue des familles (couple + enfants)
+    familles.forEach(function(f){
+      if(f.pereId && f.mereId) addSpouse(f.pereId, f.mereId);
+    });
+    personnes.forEach(function(p){
+      var f = p.familleId && F[p.familleId];
+      if(!f) return;
+      if(f.pereId) addParent(p.id, f.pereId);
+      if(f.mereId) addParent(p.id, f.mereId);
+    });
+
+    // 2. Relations déclarées
+    var directLabels = {}; // directLabels[a][b] = type (a est <type> de b)
+    relations.forEach(function(r){
+      var t = REL_TYPES[r.type];
+      if(!t || !P[r.a] || !P[r.b] || r.a === r.b) return;
+      if(t.spouse) addSpouse(r.a, r.b);
+      else if(t.direct){
+        (directLabels[r.a] = directLabels[r.a] || {})[r.b] = r.type;
+        if(t.inverse) (directLabels[r.b] = directLabels[r.b] || {})[r.a] = t.inverse;
+      }
+      else if(r.type === "parent") addParent(r.b, r.a);
+      else if(r.type === "enfant") addParent(r.a, r.b);
+      else addEdge(r.b, r.a, t.u, t.d, t.sib, "declare");
+    });
+
+    // 3. Arêtes parent/enfant
+    personnes.forEach(function(p){
+      parentsOf[p.id].forEach(function(par){ addEdge(p.id, par, 1, 0, false, "famille"); });
+    });
+
+    // 4. Frères/sœurs germains implicites (mêmes parents connus)
+    //    → permet d'appliquer aux frères/sœurs les règles de fratrie
+    personnes.forEach(function(p){
+      var pa = parentsOf[p.id];
+      if(!pa.length) return;
+      personnes.forEach(function(q){
+        if(q.id <= p.id) return;
+        var qa = parentsOf[q.id];
+        if(qa.length !== pa.length) return;
+        for(var i = 0; i < pa.length; i++) if(qa.indexOf(pa[i]) < 0) return;
+        addEdge(p.id, q.id, 1, 1, true, "implicite");
+      });
+    });
+
+    /* --------------------------------------------------
+       Recherche des parents par le sang depuis X
+       Règles de composition sûres :
+        - depuis X ou un de ses ancêtres (d = 0), on peut
+          emprunter n'importe quelle relation ;
+        - un frère/une sœur d'un ancêtre partage les mêmes
+          ascendants (état "lat") ;
+        - après être descendu (d ≥ 1), on peut seulement
+          continuer à descendre, ou passer à un frère/sœur.
+       (Le cousin d'un cousin n'est donc pas forcément
+        cousin : il peut venir de l'autre côté de la famille.)
+       -------------------------------------------------- */
+    var bloodCache = {};
+    function blood(x){
+      if(bloodCache[x]) return bloodCache[x];
+      var best = {};
+      var seen = {};
+      var queue = [{ n: x, u: 0, d: 0, lat: false, len: 0, src: null }];
+      seen[x + "|0|0|0"] = 1;
+      while(queue.length){
+        var s = queue.shift();
+        if(s.n !== x){
+          var eu = s.lat ? s.u + 1 : s.u, ed = s.lat ? 1 : s.d;
+          var cur = best[s.n];
+          var score = eu + ed;
+          if(!cur || score < cur.u + cur.d || (score === cur.u + cur.d && s.len < cur.len)){
+            best[s.n] = { u: eu, d: ed, len: s.len, src: s.len === 1 ? s.src : "deduit" };
+          }
+        }
+        var edges = adj[s.n] || [];
+        for(var i = 0; i < edges.length; i++){
+          var e = edges[i], nu, nd, nl = false;
+          if(s.d === 0 && !s.lat){
+            if(e.sib){ nu = s.u; nd = 0; nl = true; }
+            else { nu = s.u + e.u; nd = e.d; }
+          }else if(s.d === 0 && s.lat){
+            if(e.sib){ nu = s.u; nd = 0; nl = true; }
+            else if(e.u >= 1){ nu = s.u + e.u; nd = e.d; }
+            else { nu = s.u + 1; nd = 1 + e.d; }
+          }else{
+            if(e.u === 0){ nu = s.u; nd = s.d + e.d; }
+            else if(e.sib){ nu = s.u; nd = s.d; }
+            else continue;
+          }
+          if(nu > MAX_GEN || nd > MAX_GEN) continue;
+          var key = e.to + "|" + nu + "|" + nd + "|" + (nl ? 1 : 0);
+          if(seen[key]) continue;
+          seen[key] = 1;
+          queue.push({ n: e.to, u: nu, d: nd, lat: nl, len: s.len + 1, src: e.src });
+        }
+      }
+      delete best[x];
+      bloodCache[x] = best;
+      return best;
+    }
+
+    function isDemi(x, y){
+      var a = parentsOf[x] || [], b = parentsOf[y] || [];
+      if(a.length < 2 || b.length < 2) return false;
+      var shared = a.filter(function(v){ return b.indexOf(v) >= 0; }).length;
+      if(shared !== 1) return false;
+      // une fratrie déclarée explicitement l'emporte
+      return !(adj[x] || []).some(function(e){ return e.to === y && e.src === "declare" && e.sib; });
+    }
+
+    /* --------------------------------------------------
+       Toutes les relations de X : sang, conjoints, alliance
+       Renvoie [{ id, label, cat, src }]  (label = "Y est ... de X")
+       -------------------------------------------------- */
+    function relationsOf(x){
+      if(!P[x]) return [];
+      var out = {};
+      var b = blood(x);
+      Object.keys(b).forEach(function(y){
+        var r = b[y];
+        var demi = r.u === 1 && r.d === 1 && isDemi(x, y);
+        out[y] = { id: y, label: bloodLabel(r.u, r.d, P[y].sexe, demi), cat: category(r.u, r.d),
+                   src: r.src === "implicite" ? "deduit" : r.src, u: r.u, d: r.d };
+      });
+      function setIf(y, label, src){
+        if(y === x || out[y] || !P[y]) return;
+        out[y] = { id: y, label: label, cat: "alliance", src: src };
+      }
+      // conjoints
+      spousesOf[x].forEach(function(s){
+        if(out[s]) return;
+        out[s] = { id: s, label: g(P[s].sexe, "Mari", "Épouse"), cat: "conjoints", src: "famille" };
+      });
+      // parents par le sang du conjoint
+      spousesOf[x].forEach(function(s){
+        var bs = blood(s);
+        Object.keys(bs).forEach(function(z){
+          var r = bs[z], sx = P[z] && P[z].sexe, lab;
+          if(r.u === 1 && r.d === 0) lab = g(sx, "Beau-père", "Belle-mère");
+          else if(r.u === 1 && r.d === 1) lab = g(sx, "Beau-frère", "Belle-sœur");
+          else if(r.u === 0 && r.d === 1) lab = g(sx, "Beau-fils", "Belle-fille") + " (enfant du conjoint)";
+          else lab = bloodLabel(r.u, r.d, sx, false) + " par alliance";
+          setIf(z, lab, "deduit");
+        });
+      });
+      // conjoints de mes parents par le sang
+      Object.keys(b).forEach(function(y){
+        var r = b[y];
+        spousesOf[y].forEach(function(t){
+          var sx = P[t] && P[t].sexe, lab;
+          if(r.u === 1 && r.d === 0) lab = g(sx, "Beau-père", "Belle-mère");
+          else if(r.u === 0 && r.d === 1) lab = g(sx, "Gendre", "Belle-fille");
+          else if(r.u === 1 && r.d === 1) lab = g(sx, "Beau-frère", "Belle-sœur");
+          else lab = bloodLabel(r.u, r.d, sx, false) + " par alliance";
+          setIf(t, lab, "deduit");
+        });
+      });
+      // conjoints des frères/sœurs de mon conjoint
+      spousesOf[x].forEach(function(s){
+        var bs = blood(s);
+        Object.keys(bs).forEach(function(z){
+          if(bs[z].u === 1 && bs[z].d === 1){
+            spousesOf[z].forEach(function(t){ setIf(t, g(P[t] && P[t].sexe, "Beau-frère", "Belle-sœur"), "deduit"); });
+          }
+        });
+      });
+      // étiquettes d'alliance déclarées directement (y est <type> de x)
+      Object.keys(directLabels).forEach(function(a){
+        var t = directLabels[a][x];
+        if(t) setIf(a, g(P[a].sexe, REL_TYPES[t].direct[0], REL_TYPES[t].direct[1]), "declare");
+      });
+      return Object.keys(out).map(function(k){ return out[k]; });
+    }
+
+    /* --------------------------------------------------
+       Arbre généalogique d'une Grande Famille
+       -------------------------------------------------- */
+    function unionsOf(pid){
+      var map = {}, order = [];
+      childrenOf[pid].forEach(function(c){
+        var other = parentsOf[c].filter(function(q){ return q !== pid; })[0] || "";
+        if(!map[other]){ map[other] = []; order.push(other); }
+        map[other].push(c);
+      });
+      spousesOf[pid].forEach(function(s){ if(!map[s]){ map[s] = []; order.push(s); } });
+      return order.map(function(o){
+        return { spouse: o || null, children: map[o].slice().sort(byBirth) };
+      });
+    }
+
+    function byBirth(a, b){
+      var pa = P[a], pb = P[b];
+      // 1) rang dans la fratrie fixé par l'administrateur (1 = aîné)
+      var ra = parseFloat(pa.rangNaissance), rb = parseFloat(pb.rangNaissance);
+      ra = isNaN(ra) ? Infinity : ra; rb = isNaN(rb) ? Infinity : rb;
+      if(ra !== rb) return ra < rb ? -1 : 1;
+      // 2) date de naissance, 3) ordre de saisie
+      var ya = ((pa.anneeNaissance || 9999) * 13 + (pa.moisNaissance || 0)) * 32 + (pa.jourNaissance || 0);
+      var yb = ((pb.anneeNaissance || 9999) * 13 + (pb.moisNaissance || 0)) * 32 + (pb.jourNaissance || 0);
+      if(ya !== yb) return ya - yb;
+      return (pa._ord || 0) - (pb._ord || 0);
+    }
+    personnes.forEach(function(p, i){ Object.defineProperty(p, "_ord", { value: i, enumerable: false, configurable: true, writable: true }); });
+
+    function grandeFamilleOf(p){
+      if(!p) return null;
+      if(p.grandeFamilleId && GF[p.grandeFamilleId]) return p.grandeFamilleId;
+      var f = p.familleId && F[p.familleId];
+      if(f && f.grandeFamilleId) return f.grandeFamilleId;
+      var head = familles.filter(function(f){ return f.pereId === p.id || f.mereId === p.id; })[0];
+      return head ? head.grandeFamilleId : null;
+    }
+
+    // Renvoie une liste de racines (nœuds imbriqués) pour la Grande Famille
+    function treeOf(gfId){
+      var members = {};
+      personnes.forEach(function(p){ if(grandeFamilleOf(p) === gfId) members[p.id] = 1; });
+      familles.forEach(function(f){
+        if(f.grandeFamilleId !== gfId) return;
+        if(f.pereId) members[f.pereId] = 1;
+        if(f.mereId) members[f.mereId] = 1;
+      });
+      var cands = Object.keys(members).filter(function(id){
+        if(!P[id] || parentsOf[id].length) return false;
+        // conjoint(e) venu(e) d'ailleurs : il/elle apparaîtra à côté de son/sa partenaire
+        var partners = spousesOf[id].concat(childrenOf[id].reduce(function(acc, c){ return acc.concat(parentsOf[c]); }, []));
+        return !partners.some(function(q){ return q !== id && parentsOf[q] && parentsOf[q].length; });
+      });
+      cands.sort(function(a, b){
+        var ua = unionsOf(a).length, ub = unionsOf(b).length;
+        if(ua !== ub) return ub - ua;
+        var sa = P[a].sexe === "M" ? 0 : 1, sb = P[b].sexe === "M" ? 0 : 1;
+        if(sa !== sb) return sa - sb;
+        return byBirth(a, b);
+      });
+      var visited = {};
+      function node(pid, depth){
+        visited[pid] = 1;
+        var n = { id: pid, unions: [] };
+        if(depth > 12) return n;
+        unionsOf(pid).forEach(function(u){
+          if(u.spouse) visited[u.spouse] = 1;
+          n.unions.push({
+            spouse: u.spouse,
+            children: u.children.filter(function(c){ return !visited[c]; }).map(function(c){ return node(c, depth + 1); })
+          });
+        });
+        return n;
+      }
+      var roots = [];
+      cands.forEach(function(id){ if(!visited[id]) roots.push(node(id, 0)); });
+      return roots;
+    }
+
+    function familiesHeadedBy(pid){
+      return familles.filter(function(f){ return f.pereId === pid || f.mereId === pid; });
+    }
+    function childrenOfFamily(fid){
+      return personnes.filter(function(p){ return p.familleId === fid; }).map(function(p){ return p.id; }).sort(byBirth);
+    }
+
+    // Famille "fondatrice" : aucun des parents n'est enfant d'une autre famille
+    function isRootFamily(f){
+      var heads = [f.pereId, f.mereId].filter(function(id){ return P[id]; });
+      return heads.length > 0 && heads.every(function(id){ return !(P[id].familleId && F[P[id].familleId]); });
+    }
+    // Ordre de l'arbre : génération par génération, puis ordre des enfants
+    // dans la famille d'origine (année de naissance, sinon ordre de saisie)
+    function orderedFamilies(){
+      var out = [], seen = {};
+      var level = familles.filter(isRootFamily);
+      while(level.length){
+        var next = [];
+        level.forEach(function(f){ if(!seen[f.id]){ seen[f.id] = 1; out.push(f); } });
+        level.forEach(function(f){
+          childrenOfFamily(f.id).forEach(function(c){
+            familiesHeadedBy(c).forEach(function(cf){ if(!seen[cf.id] && next.indexOf(cf) < 0) next.push(cf); });
+          });
+        });
+        level = next;
+      }
+      familles.forEach(function(f){ if(!seen[f.id]) out.push(f); }); // familles non reliées
+      // Numéro d'ordre choisi dans l'administration : il l'emporte sur l'ordre
+      // automatique. Les familles sans numéro viennent ensuite.
+      var auto = {};
+      out.forEach(function(f, i){ auto[f.id] = i; });
+      function key(f){ var n = parseFloat(f.ordre); return isNaN(n) ? Infinity : n; }
+      return out.sort(function(a, b){
+        var ka = key(a), kb = key(b);
+        if(ka !== kb) return ka < kb ? -1 : 1;
+        return auto[a.id] - auto[b.id];
+      });
+    }
+
+    return {
+      P: P, F: F, GF: GF, data: data,
+      isRootFamily: isRootFamily, orderedFamilies: orderedFamilies,
+      parentsOf: parentsOf, childrenOf: childrenOf, spousesOf: spousesOf,
+      relationsOf: relationsOf, treeOf: treeOf, unionsOf: unionsOf,
+      grandeFamilleOf: grandeFamilleOf, familiesHeadedBy: familiesHeadedBy,
+      childrenOfFamily: childrenOfFamily
+    };
+  }
+
+  function emptyData(){
+    return {
+      site: { titre: "Plusieurs Branches, une Même Racine", sousTitre: "" },
+      grandesFamilles: [], familles: [], personnes: [], relations: [], nouvelles: []
+    };
+  }
+
+  return {
+    REL_TYPES: REL_TYPES, CATEGORIES: CATEGORIES, MOIS: MOIS,
+    build: build, slug: slug, fullName: fullName, birthText: birthText, dateText: dateText,
+    bloodLabel: bloodLabel, emptyData: emptyData
+  };
+})();
+
+
+</script>
+<script>
+var UI = (function(){
+  var COLORS = ["#F4B942","#7FE0A8","#E8935A","#FFD873","#2E9B63","#FF9F6E"];
+  function esc(s){
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+    });
+  }
+  function initials(p){
+    var a = (p.prenom || "").trim(), b = (p.nom || "").trim();
+    if(a && b) return (a[0] + b[0]).toUpperCase();
+    var w = (a || b || "?").split(/[\s-]+/).filter(Boolean);
+    return w.length > 1 ? (w[0][0] + w[1][0]).toUpperCase() : (w[0] || "?").slice(0, 2).toUpperCase();
+  }
+  function color(id){
+    var h = 0; id = String(id || "");
+    for(var i = 0; i < id.length; i++) h = id.charCodeAt(i) + ((h << 5) - h);
+    return COLORS[Math.abs(h) % COLORS.length];
+  }
+  // photoOverride : URL temporaire (aperçu dans l'admin)
+  function avatar(p, size, photoOverride){
+    if(!p) return "";
+    var src = photoOverride || p.photo;
+    var cls = "avatar" + (p.sexe === "M" ? " m" : p.sexe === "F" ? " f" : "");
+    var st = "--sz:" + (size || 64) + "px;--avatar-color:" + color(p.id);
+    var ini = '<span class="ini"' + (src ? ' style="display:none"' : "") + ">" + esc(initials(p)) + "</span>";
+    var img = "";
+    // en cas d'erreur de chargement, on affiche les initiales
+    if(src) img ='<img src="' + esc(src) + '" alt="" onerror="this.nextElementSibling.style.display=\'flex\';this.remove()">';
+    return '<span class="' + cls + '" style="' + st + '">' + img + ini + "</span>";
+  }
+  /* Chargement des données :
+     1) family-data.json (site hébergé ou serveur local)
+     2) sinon family-data.js — fonctionne aussi en ouvrant la page par double-clic */
+  function loadData(){
+    function viaScript(){
+      return new Promise(function(resolve, reject){
+        window.FAMILY_DATA = undefined;
+        var s = document.createElement("script");
+        s.src = "family-data.js?v=" + Date.now();
+        s.onload = function(){ window.FAMILY_DATA ? resolve(window.FAMILY_DATA) : reject(new Error("vide")); };
+        s.onerror = function(){ reject(new Error("absent")); };
+        document.head.appendChild(s);
+      });
+    }
+    if(location.protocol === "file:") return viaScript();
+    return fetch("family-data.json", { cache: "no-store" })
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .catch(viaScript);
+  }
+  function dataToJs(data){
+    return "/* Copie de family-data.json lisible par double-clic (générée par admin.html). Ne pas modifier à la main. */\n" +
+      "window.FAMILY_DATA = " + JSON.stringify(data, null, 2) + ";\n";
+  }
+  return { esc: esc, avatar: avatar, initials: initials, loadData: loadData, dataToJs: dataToJs };
+})();
+
+</script>
+<script>
+(function(){
+  "use strict";
+  var app = document.getElementById("app");
+  var esc = UI.esc, avatar = UI.avatar, name = Genea.fullName;
+  var M = null, DATA = null, PREVIEW = /[?&]apercu=1/.test(location.search);
+  var filterGF = "", query = "";
+
+  /* ---------- Chargement des données ---------- */
+  function start(data){
+    DATA = data; M = Genea.build(data);
+    window.addEventListener("hashchange", route);
+    route();
+  }
+  function loadFailed(){
+    app.innerHTML =
+      '<div class="loadbox"><p class="eyebrow">Données introuvables</p>' +
+      '<h1>Impossible de lire family-data.json</h1>' +
+      '<p>Vérifiez que <code>family-data.json</code> et <code>family-data.js</code> sont bien dans le même dossier que <code>index.html</code>. ' +
+      'Vous pouvez aussi choisir le fichier manuellement :</p>' +
+      '<p><label class="btn">Ouvrir family-data.json<input type="file" accept=".json,application/json" hidden id="pick"></label></p></div>';
+    document.getElementById("pick").addEventListener("change", function(e){
+      var f = e.target.files[0]; if(!f) return;
+      var r = new FileReader();
+      r.onload = function(){ try{ start(JSON.parse(r.result)); }catch(err){ alert("Fichier JSON invalide : " + err.message); } };
+      r.readAsText(f);
+    });
+  }
+  if(PREVIEW){
+    var draft = null;
+    try{ draft = JSON.parse(localStorage.getItem("genea-admin-draft") || "null"); }catch(e){}
+    if(draft) start(draft); else loadJson();
+  }else loadJson();
+  function loadJson(){
+    UI.loadData().then(start).catch(loadFailed);
+  }
+
+  /* ---------- Gabarits communs ---------- */
+  function site(){ return DATA.site || {}; }
+  function header(){
+    var h = (location.hash || "#/").split("/")[1] || "";
+    function nav(href, label, key){ return '<a class="btn ghost small' + (h === key ? ' on' : '') + '" href="' + href + '">' + label + '</a>'; }
+    return (PREVIEW ? '<div class="preview-bar">Aperçu du brouillon de l\'administration — non publié</div>' : "") +
+      '<header class="site-header"><a class="brand" href="#/">' + esc(site().titre || "Plusieurs Branches, une Même Racine") + '</a>' +
+      '<nav>' + nav("#/", "Familles", "") + nav("#/anniversaires", "Anniversaires", "anniversaires") + nav("#/nouvelles", "Nouvelles & photos", "nouvelles") + '</nav></header>';
+  }
+  function footer(){
+    return '<footer class="site-footer">' + esc(site().titre || "") + ' · ' + M.data.personnes.length + ' personnes · ' +
+      M.data.familles.length + ' familles</footer>';
+  }
+  function yearOf(p){ return p && p.anneeNaissance ? p.anneeNaissance : ""; }
+  function gfName(id){ return M.GF[id] ? M.GF[id].nom : ""; }
+  function rootsSvg(){
+    return '<svg viewBox="0 0 800 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' +
+      '<path d="M400,420 C400,320 320,290 260,240 C210,200 200,140 230,50"/>' +
+      '<path class="sage" d="M400,420 C400,320 480,290 540,240 C590,200 600,140 570,50"/>' +
+      '<path d="M400,420 C400,340 360,310 300,290 C250,275 190,275 140,240"/>' +
+      '<path class="sage" d="M400,420 C400,340 440,310 500,290 C550,275 610,275 660,240"/>' +
+      '<path d="M400,420 C400,350 400,300 400,220 C400,150 380,100 340,30"/>' +
+      '<path class="sage" d="M400,420 C400,350 400,300 400,220 C400,150 420,100 460,30"/></svg>';
+  }
+
+  function parentBlock(id, role){
+    var p = M.P[id];
+    if(!p) return '<div class="parent unknown"><span class="avatar" style="--sz:76px"><span class="ini">?</span></span><span class="role">' + role + '</span><span class="name">Non renseigné' + (role === "Mère" ? "e" : "") + '</span></div>';
+    return '<a class="parent" href="#/personne/' + encodeURIComponent(id) + '">' + avatar(p, 76) +
+      '<span class="role">' + role + '</span><span class="name">' + esc(name(p)) + '</span></a>';
+  }
+
+  // Couple : si un seul parent est renseigné (famille d'une personne seule),
+  // on n'affiche que cette personne, sans case « époux / épouse » vide.
+  function coupleHtml(f, extra){
+    var hasP = !!M.P[f.pereId], hasM = !!M.P[f.mereId];
+    if(hasP && hasM) return '<div class="couple' + (extra || "") + '">' + parentBlock(f.pereId, "Père") + '<span class="heart">♥</span>' + parentBlock(f.mereId, "Mère") + '</div>';
+    if(!hasP && !hasM) return "";
+    var id = hasP ? f.pereId : f.mereId, p = M.P[id];
+    return '<div class="solo' + (extra || "") + '"><a class="parent" href="#/personne/' + encodeURIComponent(id) + '">' + avatar(p, 96) +
+      '<span class="name">' + esc(name(p)) + '</span>' + (Genea.birthText(p) ? '<span class="role">' + esc(Genea.birthText(p)) + '</span>' : '') + '</a></div>';
+  }
+
+  // Familles d'un même père (plusieurs épouses) : affichées dans une seule boîte
+  function groupByFather(fams){
+    var groups = [], byPere = {};
+    fams.forEach(function(f){
+      if(f.pereId && M.P[f.pereId]){
+        if(byPere[f.pereId]){ byPere[f.pereId].push(f); return; }
+        byPere[f.pereId] = [f];
+        groups.push(byPere[f.pereId]);
+      }else groups.push([f]);
+    });
+    return groups;
+  }
+  function siblingsOfFamily(f){
+    if(!f.pereId || !M.P[f.pereId]) return [f];
+    return M.orderedFamilies().filter(function(x){ return x.pereId === f.pereId; });
+  }
+  function kidItem(k){
+    var p = M.P[k];
+    var hasFam = M.familiesHeadedBy(k).some(function(x){ return M.childrenOfFamily(x.id).length || (x.pereId && x.mereId); });
+    return '<li><a href="#/personne/' + encodeURIComponent(k) + '">' + avatar(p, 30) + '<span>' + esc(name(p)) +
+      (hasFam ? ' <span class="plus" title="A fondé sa propre famille">●</span>' : '') + '</span>' +
+      '<span class="yr">' + esc(yearOf(p)) + '</span></a></li>';
+  }
+  function groupCard(group){
+    if(group.length === 1) return familyCard(group[0]);
+    var f0 = group[0];
+    var names = group.map(function(f){ return f.nom; }).filter(function(n, i, a){ return a.indexOf(n) === i; });
+    var total = 0;
+    var cols = group.map(function(f){
+      var kids = M.childrenOfFamily(f.id); total += kids.length;
+      if(!kids.length) return "";
+      var mere = M.P[f.mereId];
+      return '<div><h4>Avec ' + esc(mere ? name(mere) : "mère non renseignée") + ' (' + kids.length + ')</h4><ul>' + kids.map(kidItem).join("") + '</ul></div>';
+    }).join("");
+    return '<article class="fcard merged" id="f-' + esc(f0.id) + '">' +
+      '<div class="fcard-head"><h2><a href="#/famille/' + encodeURIComponent(f0.id) + '">' + esc(names.join(" / ")) + '</a></h2>' +
+      (f0.grandeFamilleId && M.GF[f0.grandeFamilleId] ? '<a class="chip" href="#/grande-famille/' + encodeURIComponent(f0.grandeFamilleId) + '" title="Voir l\'arbre">' + esc(gfName(f0.grandeFamilleId)) + '</a>' : '') +
+      '</div>' + multiCoupleHtml(group) +
+      (total ? '<div class="kids"><h3>Enfants (' + total + ')</h3><div class="kids-cols">' + cols + '</div></div>' : '') + '</article>';
+  }
+  function multiCoupleHtml(group){
+    var html = parentBlock(group[0].pereId, "Père") + '<span class="heart" style="margin-top:30px">♥</span>';
+    html += group.map(function(f){ return M.P[f.mereId] ? parentBlock(f.mereId, "Mère") : ""; }).join("");
+    return '<div class="couple multi">' + html + '</div>';
+  }
+
+  function familyCard(f){
+    var kids = M.childrenOfFamily(f.id);
+    var list = kids.length ? '<ul>' + kids.map(kidItem).join("") + '</ul>' : '';
+    return '<article class="fcard" id="f-' + esc(f.id) + '">' +
+      '<div class="fcard-head"><h2><a href="#/famille/' + encodeURIComponent(f.id) + '">' + esc(f.nom) + '</a></h2>' +
+      (f.grandeFamilleId && M.GF[f.grandeFamilleId] ? '<a class="chip" href="#/grande-famille/' + encodeURIComponent(f.grandeFamilleId) + '" title="Voir l\'arbre">' + esc(gfName(f.grandeFamilleId)) + '</a>' : '') +
+      '</div>' +
+      coupleHtml(f) +
+      (kids.length ? '<div class="kids"><h3>Enfants (' + kids.length + ')</h3>' + list + '</div>' : '') + '</article>';
+  }
+
+  /* ---------- Page d'accueil ---------- */
+  function renderHome(){
+    document.title = site().titre || "Plusieurs Branches, une Même Racine";
+    var gfs = M.data.grandesFamilles;
+    app.innerHTML = header() +
+      '<section class="hero">' + rootsSvg() + '<div class="hero-inner"><p class="eyebrow">Notre histoire de famille</p>' +
+      '<h1>' + esc(site().titre || "Plusieurs Branches, une Même Racine") + '</h1>' +
+      (site().sousTitre ? '<p>' + esc(site().sousTitre) + '</p>' : '') + '</div></section>' +
+      (gfs.length ? '<div class="gf-strip">' + gfs.map(function(g){
+        var n = M.data.familles.filter(function(f){ return f.grandeFamilleId === g.id; }).length;
+        return '<a class="gf-card" href="#/grande-famille/' + encodeURIComponent(g.id) + '"><span><small>Grande Famille</small><strong>' + esc(g.nom) + '</strong>' +
+          '<small>' + n + ' famille' + (n > 1 ? 's' : '') + '</small></span><span class="go">Arbre →</span></a>';
+      }).join("") + '</div>' : '') +
+      '<div class="home-layout"><div class="home-main">' +
+      '<div class="toolbar"><div class="filters" id="filters"></div>' +
+      '<input class="search" id="q" type="search" placeholder="Rechercher un nom…" value="' + esc(query) + '"></div>' +
+      '<div class="grid" id="grid"></div></div>' +
+      '<aside class="home-side" aria-label="Anniversaires et nouvelles">' + teasersHtml() + '</aside></div>' + footer();
+
+    var fl = document.getElementById("filters");
+    fl.innerHTML = '<button class="chip' + (filterGF ? '' : ' on') + '" data-gf="">Toutes</button>' +
+      gfs.map(function(g){ return '<button class="chip' + (filterGF === g.id ? ' on' : '') + '" data-gf="' + esc(g.id) + '">' + esc(g.nom) + '</button>'; }).join("");
+    fl.addEventListener("click", function(e){
+      var b = e.target.closest("button"); if(!b) return;
+      filterGF = b.getAttribute("data-gf");
+      fl.querySelectorAll("button").forEach(function(x){ x.classList.toggle("on", x === b); });
+      drawGrid();
+    });
+    document.getElementById("q").addEventListener("input", function(e){ query = e.target.value; drawGrid(); });
+    drawGrid();
+  }
+  function norm(s){ return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+  function drawGrid(){
+    var q = norm(query.trim());
+    var fams = M.orderedFamilies().filter(function(f){
+      if(filterGF && f.grandeFamilleId !== filterGF) return false;
+      if(!q) return true;
+      var ids = [f.pereId, f.mereId].concat(M.childrenOfFamily(f.id));
+      return norm(f.nom).indexOf(q) >= 0 || ids.some(function(id){ return M.P[id] && norm(name(M.P[id])).indexOf(q) >= 0; });
+    });
+    // 1re rangée : uniquement les familles fondatrices
+    var roots = fams.filter(M.isRootFamily), others = fams.filter(function(f){ return !M.isRootFamily(f); });
+    var html = "";
+    if(roots.length) html += '<div class="grid-row roots">' + groupByFather(roots).map(groupCard).join("") + '</div>';
+    if(others.length) html += '<div class="grid-row">' + groupByFather(others).map(groupCard).join("") + '</div>';
+    document.getElementById("grid").innerHTML = html ||
+      '<div class="empty">' + (M.data.familles.length ? 'Aucune famille ne correspond à la recherche.' :
+      'Aucune famille pour le moment. Ajoutez-en depuis <strong>admin.html</strong>.') + '</div>';
+  }
+
+  /* ---------- Page famille ---------- */
+  function renderFamily(id){
+    var f = M.F[id];
+    if(!f) return notFound("Famille");
+    var group = siblingsOfFamily(f);
+    if(group.length > 1) return renderMergedFamily(group);
+    document.title = f.nom + " — " + (site().titre || "");
+    var kids = M.childrenOfFamily(id);
+    var origins = [f.pereId, f.mereId].map(function(pid){
+      var p = M.P[pid]; return p && p.familleId && M.F[p.familleId] ? M.F[p.familleId] : null;
+    }).filter(Boolean);
+    app.innerHTML = header() +
+      '<header class="page-head"><p class="eyebrow">' + esc(gfName(f.grandeFamilleId) ? "Grande Famille " + gfName(f.grandeFamilleId) : "Famille") + '</p>' +
+      '<h1>' + esc(f.nom) + '</h1><div class="actions">' +
+      (f.grandeFamilleId && M.GF[f.grandeFamilleId] ? '<a class="btn" href="#/grande-famille/' + encodeURIComponent(f.grandeFamilleId) + '">Voir l\'arbre généalogique</a>' : '') +
+      origins.map(function(o){ return '<a class="btn ghost" href="#/famille/' + encodeURIComponent(o.id) + '">↑ ' + esc(o.nom) + '</a>'; }).join("") +
+      '</div></header>' +
+      '<section class="family-page">' + coupleHtml(f) +
+      (kids.length ? '<h2 class="section-title">Enfants (' + kids.length + ')</h2><div class="kid-grid">' + kids.map(function(k){
+        var p = M.P[k];
+        return '<a href="#/personne/' + encodeURIComponent(k) + '">' + avatar(p, 72) + '<b>' + esc(name(p)) + '</b><small>' + esc(Genea.birthText(p) || "") + '</small></a>';
+      }).join("") + '</div>' : '') +
+      '</section>' + footer();
+  }
+
+  function renderMergedFamily(group){
+    var f0 = group[0];
+    var names = group.map(function(f){ return f.nom; }).filter(function(n, i, a){ return a.indexOf(n) === i; });
+    document.title = names.join(" / ") + " — " + (site().titre || "");
+    var pere = M.P[f0.pereId];
+    var origin = pere && pere.familleId && M.F[pere.familleId];
+    var total = 0;
+    var body = group.map(function(f){
+      var kids = M.childrenOfFamily(f.id); total += kids.length;
+      if(!kids.length) return "";
+      var mere = M.P[f.mereId];
+      return '<h3 class="sub-title">Avec ' + esc(mere ? name(mere) : "mère non renseignée") + ' (' + kids.length + ')</h3><div class="kid-grid">' + kids.map(function(k){
+        var p = M.P[k];
+        return '<a href="#/personne/' + encodeURIComponent(k) + '">' + avatar(p, 72) + '<b>' + esc(name(p)) + '</b><small>' + esc(Genea.birthText(p) || "") + '</small></a>';
+      }).join("") + '</div>';
+    }).join("");
+    app.innerHTML = header() +
+      '<header class="page-head"><p class="eyebrow">' + esc(gfName(f0.grandeFamilleId) ? "Grande Famille " + gfName(f0.grandeFamilleId) : "Famille") + '</p>' +
+      '<h1>' + esc(names.join(" / ")) + '</h1><div class="actions">' +
+      (f0.grandeFamilleId && M.GF[f0.grandeFamilleId] ? '<a class="btn" href="#/grande-famille/' + encodeURIComponent(f0.grandeFamilleId) + '">Voir l\'arbre généalogique</a>' : '') +
+      (origin ? '<a class="btn ghost" href="#/famille/' + encodeURIComponent(origin.id) + '">↑ ' + esc(origin.nom) + '</a>' : '') +
+      '</div></header><section class="family-page" style="max-width:1000px">' + multiCoupleHtml(group) +
+      (total ? '<h2 class="section-title" style="margin-top:1.5rem">Enfants (' + total + ')</h2>' + body : '') +
+      '</section>' + footer();
+  }
+
+  /* ---------- Fiche personne ---------- */
+  function renderPerson(id){
+    var p = M.P[id];
+    if(!p) return notFound("Personne");
+    document.title = name(p) + " — " + (site().titre || "");
+    var fam = p.familleId && M.F[p.familleId];
+    var foyers = M.familiesHeadedBy(id);
+    var gfId = M.grandeFamilleOf(p);
+    var rels = M.relationsOf(id);
+    var groups = {};
+    rels.forEach(function(r){ (groups[r.cat] = groups[r.cat] || []).push(r); });
+
+    var relHtml = Genea.CATEGORIES.filter(function(c){ return groups[c[0]]; }).map(function(c){
+      var items = groups[c[0]].sort(function(a, b){
+        return (a.u || 0) + (a.d || 0) - ((b.u || 0) + (b.d || 0)) || name(M.P[a.id]).localeCompare(name(M.P[b.id]));
+      });
+      return '<section class="relgroup"><h2>' + c[1] + ' (' + items.length + ')</h2><ul>' + items.map(function(r){
+        var q = M.P[r.id];
+        return '<li><a href="#/personne/' + encodeURIComponent(r.id) + '">' + avatar(q, 38) +
+          '<span class="who"><b>' + esc(name(q)) + '</b><span>' + esc(r.label) +
+          (r.src === "deduit" ? '<span class="badge-deduit" title="Relation déduite automatiquement">déduit</span>' : '') +
+          '</span></span></a></li>';
+      }).join("") + '</ul></section>';
+    }).join("");
+
+    var sexe = p.sexe === "M" ? "Homme" : p.sexe === "F" ? "Femme" : "Non précisé";
+    app.innerHTML = header() +
+      '<div class="person"><aside class="idcard">' + avatar(p, 150) +
+      '<h1>' + esc(name(p)) + '</h1>' +
+      '<dl><dt>Prénom</dt><dd>' + esc(p.prenom || "—") + '</dd><dt>Nom</dt><dd>' + esc(p.nom || "—") + '</dd>' +
+      '<dt>Sexe</dt><dd>' + sexe + '</dd>' +
+      '<dt>Naissance</dt><dd>' + esc(Genea.birthText(p) || "—") + '</dd>' +
+      '<dt>Famille</dt><dd>' + (fam ? '<a href="#/famille/' + encodeURIComponent(fam.id) + '">' + esc(fam.nom) + '</a>' : '—') + '</dd>' +
+      (foyers.length ? '<dt>Foyer' + (foyers.length > 1 ? 's' : '') + '</dt><dd>' + foyers.map(function(f){
+        return '<a href="#/famille/' + encodeURIComponent(f.id) + '">' + esc(f.nom) + '</a>'; }).join("<br>") + '</dd>' : '') +
+      '<dt>Grande Famille</dt><dd>' + (gfId && M.GF[gfId] ? '<a href="#/grande-famille/' + encodeURIComponent(gfId) + '/' + encodeURIComponent(id) + '">' + esc(gfName(gfId)) + ' — voir l\'arbre</a>' : '—') + '</dd>' +
+      '</dl></aside><div class="rels">' + personNewsHtml(id) +
+      (relHtml ? relHtml + '<p class="legend">Les relations marquées <span class="badge-deduit">déduit</span> sont calculées automatiquement à partir des familles et des liens déclarés.</p>'
+               : '<div class="empty">Aucune relation enregistrée pour le moment.</div>') +
+      '</div></div>' + footer();
+  }
+
+  /* ---------- Arbre d'une Grande Famille ---------- */
+  function tPerson(id, focus, label){
+    var p = M.P[id];
+    if(!p) return '<span class="tperson unknown"><span class="avatar" style="--sz:52px"><span class="ini">?</span></span><b>Inconnu(e)</b></span>';
+    return '<a class="tperson' + (id === focus ? ' focus' : '') + '" id="t-' + esc(id) + '" href="#/personne/' + encodeURIComponent(id) + '">' +
+      (label ? '<span class="union-label">' + label + '</span>' : '') + avatar(p, 52) +
+      '<b>' + esc(name(p)) + '</b>' + (p.anneeNaissance ? '<small>' + p.anneeNaissance + '</small>' : '') + '</a>';
+  }
+  function childrenUl(children, focus){
+    if(!children.length) return "";
+    return '<ul>' + children.map(function(c){ return treeLi(c, focus); }).join("") + '</ul>';
+  }
+  function toggleBtn(){ return '<button class="toggle" type="button" title="Replier / déplier" aria-label="Replier ou déplier la descendance">−</button>'; }
+  function treeLi(n, focus){
+    var unions = n.unions;
+    if(unions.length === 0){
+      return '<li><div class="tnode">' + tPerson(n.id, focus) + '</div></li>';
+    }
+    if(unions.length === 1){
+      var u = unions[0], has = u.children.length;
+      return '<li><div class="tnode">' + tPerson(n.id, focus) + '<span class="heart">♥</span>' +
+        (u.spouse ? tPerson(u.spouse, focus) : tPerson(null)) + (has ? toggleBtn() : '') + '</div>' +
+        childrenUl(u.children, focus) + '</li>';
+    }
+    return '<li><div class="tnode">' + tPerson(n.id, focus) + toggleBtn() + '</div><ul class="unions">' +
+      unions.map(function(u){
+        return '<li><div class="tnode">' + (u.spouse ? tPerson(u.spouse, focus, "Union") : tPerson(null)) +
+          (u.children.length ? toggleBtn() : '') + '</div>' + childrenUl(u.children, focus) + '</li>';
+      }).join("") + '</ul></li>';
+  }
+  var zoom = 1;
+  function renderTree(gfId, focus){
+    var gf = M.GF[gfId];
+    if(!gf) return notFound("Grande Famille");
+    document.title = "Arbre " + gf.nom + " — " + (site().titre || "");
+    var roots = M.treeOf(gfId);
+    app.innerHTML = header() +
+      '<header class="page-head"><p class="eyebrow">Grande Famille</p><h1>Arbre généalogique ' + esc(gf.nom) + '</h1>' +
+      (gf.description ? '<p>' + esc(gf.description) + '</p>' : '') + '</header>' +
+      (roots.length ? '<div class="tree-tools"><button class="btn ghost small" data-z="-">− Zoom</button>' +
+        '<button class="btn ghost small" data-z="0">100 %</button><button class="btn ghost small" data-z="+">+ Zoom</button>' +
+        '<button class="btn ghost small" data-z="fit">Ajuster</button></div>' +
+        '<div class="tree-wrap" id="tw"><div class="tree" id="tree"><ul>' + roots.map(function(r){ return treeLi(r, focus); }).join("") + '</ul></div></div>'
+        : '<div class="empty">Aucun lien parent/enfant enregistré pour cette Grande Famille.</div>') + footer();
+
+    var tree = document.getElementById("tree");
+    if(!tree) return;
+    function apply(){ tree.style.zoom = zoom; }
+    apply();
+    document.querySelector(".tree-tools").addEventListener("click", function(e){
+      var b = e.target.closest("button"); if(!b) return;
+      var z = b.getAttribute("data-z");
+      if(z === "+") zoom = Math.min(1.6, zoom + .15);
+      else if(z === "-") zoom = Math.max(.3, zoom - .15);
+      else if(z === "0") zoom = 1;
+      else { tree.style.zoom = 1; var w = document.getElementById("tw").clientWidth - 40; zoom = Math.max(.3, Math.min(1, w / tree.scrollWidth)); }
+      apply();
+      if(z === "fit") document.getElementById("tw").scrollLeft = 0;
+    });
+    tree.addEventListener("click", function(e){
+      var t = e.target.closest(".toggle"); if(!t) return;
+      var li = t.closest("li"); li.classList.toggle("collapsed");
+      t.textContent = li.classList.contains("collapsed") ? "+" : "−";
+    });
+    var tw = document.getElementById("tw");
+    var target = focus && document.getElementById("t-" + focus);
+    requestAnimationFrame(function(){
+      if(target){
+        target.scrollIntoView({ block: "center", inline: "center" });
+      }else{
+        tw.scrollLeft = (tw.scrollWidth - tw.clientWidth) / 2;
+      }
+    });
+  }
+
+  /* ---------- Anniversaires ---------- */
+  function ageThisYear(p, year){ return p.anneeNaissance ? year - p.anneeNaissance : null; }
+  function bdayItem(p, year){
+    var age = ageThisYear(p, year);
+    var day = p.jourNaissance ? (p.jourNaissance === 1 ? "1er" : p.jourNaissance) + " " + Genea.MOIS[p.moisNaissance - 1] : Genea.MOIS[p.moisNaissance - 1];
+    return '<li><a href="#/personne/' + encodeURIComponent(p.id) + '">' + avatar(p, 34) + '<span>' + esc(name(p)) + '</span>' +
+      '<span class="when">' + esc(day) + (age != null && age >= 0 ? '<small>' + (age === 0 ? "naissance" : age + " an" + (age > 1 ? "s" : "")) + '</small>' : '') + '</span></a></li>';
+  }
+  function peopleOfMonth(m){
+    return M.data.personnes.filter(function(p){ return p.moisNaissance === m; })
+      .sort(function(a, b){ return (a.jourNaissance || 99) - (b.jourNaissance || 99) || name(a).localeCompare(name(b)); });
+  }
+  function renderBirthdays(){
+    document.title = "Calendrier des anniversaires — " + (site().titre || "");
+    var now = new Date(), cur = now.getMonth() + 1, year = now.getFullYear();
+    var months = [];
+    for(var i = 0; i < 12; i++) months.push(((cur - 1 + i) % 12) + 1);
+    var known = M.data.personnes.filter(function(p){ return p.moisNaissance; }).length;
+    var missing = M.data.personnes.length - known;
+    app.innerHTML = header() +
+      '<header class="page-head"><p class="eyebrow">À ne pas oublier</p><h1>Calendrier des anniversaires</h1>' +
+      '<p>À partir du mois en cours. L\'âge indiqué est celui atteint cette année.</p></header>' +
+      '<div class="cal">' + months.map(function(m){
+        var y = m < cur ? year + 1 : year;
+        var list = peopleOfMonth(m);
+        return '<section class="month' + (m === cur ? ' now' : '') + '"><h2>' + Genea.MOIS[m - 1].replace(/^./, function(c){ return c.toUpperCase(); }) +
+          (m === cur ? ' <span>Ce mois-ci</span>' : '') + '</h2>' +
+          (list.length ? '<ul class="bday-list">' + list.map(function(p){ return bdayItem(p, y); }).join("") + '</ul>' : '<p class="none">Aucun anniversaire enregistré.</p>') + '</section>';
+      }).join("") + '</div>' +
+      (missing ? '<p class="cal-note">' + missing + ' personne' + (missing > 1 ? 's n\'ont' : ' n\'a') + ' pas encore de mois de naissance : ' +
+        'complétez leur fiche dans <b>admin.html</b> pour les voir apparaître ici.</p>' : '') + footer();
+  }
+
+  /* ---------- Nouvelles & photos ---------- */
+  function newsList(){
+    return (M.data.nouvelles || []).slice().sort(function(a, b){ return String(b.date || "").localeCompare(String(a.date || "")); });
+  }
+  function photoSrc(ph){ return typeof ph === "string" ? ph : (ph && ph.src) || ""; }
+  function photoCap(ph){ return typeof ph === "string" ? "" : (ph && ph.legende) || ""; }
+  function imgTag(src){
+    return '<img src="' + esc(src) + '" alt="" loading="lazy" onerror="this.outerHTML=\'<span class=&quot;imgmiss&quot;>' + esc(src).replace(/&#39;/g, "") + '</span>\'">';
+  }
+  function galleryHtml(post, max){
+    var photos = post.photos || [];
+    if(!photos.length) return "";
+    var shown = max ? photos.slice(0, max) : photos;
+    var cls = max ? ' cover n' + shown.length : '';
+    return '<div class="gallery' + cls + '" style="--n:' + shown.length + '">' + shown.map(function(ph, i){
+      var extra = max && i === shown.length - 1 && photos.length > shown.length ? '<span class="plusn">+' + (photos.length - shown.length) + '</span>' : '';
+      return '<button type="button" data-lb="' + esc(post.id) + '" data-i="' + i + '" aria-label="Agrandir la photo">' + imgTag(photoSrc(ph)) +
+        (!max && photoCap(ph) ? '<span class="cap">' + esc(photoCap(ph)) + '</span>' : '') + extra + '</button>';
+    }).join("") + '</div>';
+  }
+  function tagsHtml(post){
+    var ids = (post.personnes || []).filter(function(id){ return M.P[id]; });
+    if(!ids.length) return "";
+    return '<div class="tags">' + ids.map(function(id){
+      return '<a href="#/personne/' + encodeURIComponent(id) + '">' + avatar(M.P[id], 24) + esc(name(M.P[id])) + '</a>';
+    }).join("") + '</div>';
+  }
+  function excerpt(t, n){ t = String(t || ""); return t.length > n ? t.slice(0, n).replace(/\s+\S*$/, "") + "…" : t; }
+  function postMeta(post){
+    return '<span class="date">' + esc(Genea.dateText(post.date)) +
+      (post.grandeFamilleId && M.GF[post.grandeFamilleId] ? ' · Grande Famille ' + esc(M.GF[post.grandeFamilleId].nom) : '') + '</span>';
+  }
+  function renderNews(){
+    document.title = "Nouvelles & photos — " + (site().titre || "");
+    var list = newsList();
+    app.innerHTML = header() +
+      '<header class="page-head"><p class="eyebrow">La vie de la famille</p><h1>Nouvelles et photos de famille</h1>' +
+      '<p>Mariages, naissances, réunions, fêtes… les moments partagés.</p></header>' +
+      '<div class="news">' + (list.length ? list.map(function(post){
+        return '<article class="post">' + galleryHtml(post, 4) + '<div class="post-body">' + postMeta(post) +
+          '<h2><a href="#/nouvelles/' + encodeURIComponent(post.id) + '">' + esc(post.titre) + '</a></h2>' +
+          (post.texte ? '<p class="txt">' + esc(excerpt(post.texte, 320)) + '</p>' : '') +
+          '<a class="more" href="#/nouvelles/' + encodeURIComponent(post.id) + '">Lire et voir les ' + (post.photos || []).length + ' photo(s) →</a>' +
+          tagsHtml(post) + '</div></article>';
+      }).join("") : '<div class="empty">Aucune nouvelle pour le moment. Ajoutez la première depuis <strong>admin.html</strong> (onglet « Nouvelles &amp; photos »).</div>') +
+      '</div>' + footer();
+  }
+  function renderPost(id){
+    var post = (M.data.nouvelles || []).filter(function(n){ return n.id === id; })[0];
+    if(!post) return notFound("Nouvelle");
+    document.title = post.titre + " — " + (site().titre || "");
+    app.innerHTML = header() +
+      '<header class="page-head"><p class="eyebrow">' + esc(Genea.dateText(post.date) || "Nouvelle") + '</p><h1>' + esc(post.titre) + '</h1>' +
+      '<div class="actions"><a class="btn ghost small" href="#/nouvelles">← Toutes les nouvelles</a></div></header>' +
+      '<div class="news"><article class="post"><div class="post-body">' + postMeta(post) +
+      (post.texte ? '<p class="txt" style="margin-top:.6rem">' + esc(post.texte) + '</p>' : '') + tagsHtml(post) + '</div>' +
+      galleryHtml(post, 0) + '</article></div>' + footer();
+  }
+  function personNewsHtml(pid){
+    var list = newsList().filter(function(n){ return (n.personnes || []).indexOf(pid) >= 0; });
+    if(!list.length) return "";
+    return '<section class="relgroup"><h2>Nouvelles & photos (' + list.length + ')</h2><div class="news-mini">' + list.map(miniPost).join("") + '</div></section>';
+  }
+  function miniPost(post){
+    var first = (post.photos || [])[0];
+    return '<a href="#/nouvelles/' + encodeURIComponent(post.id) + '"><span class="thumb">' + (first ? imgTag(photoSrc(first)) : '✦') + '</span>' +
+      '<span><b>' + esc(post.titre) + '</b><small>' + esc(Genea.dateText(post.date)) + ' · ' + (post.photos || []).length + ' photo(s)</small></span></a>';
+  }
+  function teasersHtml(){
+    var now = new Date(), cur = now.getMonth() + 1;
+    var bd = peopleOfMonth(cur);
+    var news = newsList().slice(0, 3);
+    return '<div class="teasers"><section class="teaser"><h2>Anniversaires de ' + Genea.MOIS[cur - 1] + ' <a href="#/anniversaires">Calendrier →</a></h2>' +
+      (bd.length ? '<ul class="bday-list">' + bd.slice(0, 6).map(function(p){ return bdayItem(p, now.getFullYear()); }).join("") + '</ul>' +
+        (bd.length > 6 ? '<p class="muted" style="margin-top:.4rem">… et ' + (bd.length - 6) + ' autre(s).</p>' : '')
+        : '<p class="muted">Aucun anniversaire enregistré ce mois-ci.</p>') + '</section>' +
+      '<section class="teaser"><h2>Dernières nouvelles <a href="#/nouvelles">Tout voir →</a></h2>' +
+      (news.length ? '<div class="news-mini">' + news.map(miniPost).join("") + '</div>' : '<p class="muted">Aucune nouvelle pour le moment.</p>') + '</section></div>';
+  }
+
+  /* ---------- Visionneuse de photos ---------- */
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("[data-lb]"); if(!b) return;
+    var post = (M.data.nouvelles || []).filter(function(n){ return n.id === b.getAttribute("data-lb"); })[0];
+    if(post) openLightbox(post.photos || [], +b.getAttribute("data-i"));
+  });
+  function openLightbox(photos, i){
+    var box = document.createElement("div");
+    box.className = "lightbox"; box.setAttribute("role", "dialog");
+    function show(){
+      var ph = photos[i];
+      box.innerHTML = '<img src="' + esc(photoSrc(ph)) + '" alt="">' + (photoCap(ph) ? '<p>' + esc(photoCap(ph)) + '</p>' : '') +
+        '<p style="font-size:.75rem;opacity:.6">' + (i + 1) + ' / ' + photos.length + '</p>' +
+        '<button class="lb-x" aria-label="Fermer">×</button>' +
+        (photos.length > 1 ? '<button class="lb-p" aria-label="Précédente">‹</button><button class="lb-n" aria-label="Suivante">›</button>' : '');
+    }
+    function close(){ box.remove(); document.removeEventListener("keydown", key); }
+    function move(d){ i = (i + d + photos.length) % photos.length; show(); }
+    function key(e){ if(e.key === "Escape") close(); if(e.key === "ArrowRight") move(1); if(e.key === "ArrowLeft") move(-1); }
+    box.addEventListener("click", function(e){
+      if(e.target.closest(".lb-p")) move(-1);
+      else if(e.target.closest(".lb-n")) move(1);
+      else if(e.target.closest(".lb-x") || e.target === box) close();
+    });
+    document.addEventListener("keydown", key);
+    show(); document.body.appendChild(box);
+  }
+
+  function notFound(what){
+    app.innerHTML = header() + '<div class="empty" style="margin-top:4rem">' + what + ' introuvable.<br><br><a class="btn ghost small" href="#/">← Retour aux familles</a></div>' + footer();
+  }
+
+  function route(){
+    var parts = (location.hash || "#/").replace(/^#\/?/, "").split("/").filter(Boolean).map(decodeURIComponent);
+    if(parts[0] === "personne" && parts[1]) renderPerson(parts[1]);
+    else if(parts[0] === "famille" && parts[1]) renderFamily(parts[1]);
+    else if(parts[0] === "grande-famille" && parts[1]) renderTree(parts[1], parts[2]);
+    else if(parts[0] === "anniversaires") renderBirthdays();
+    else if(parts[0] === "nouvelles" && parts[1]) renderPost(parts[1]);
+    else if(parts[0] === "nouvelles") renderNews();
+    else renderHome();
+    if(!(parts[0] === "grande-famille" && parts[2])) window.scrollTo(0, 0);
+  }
+})();
+</script>
+</body>
+</html>
