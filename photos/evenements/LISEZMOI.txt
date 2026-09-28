@@ -1,2 +1,0 @@
-Déposez ici les photos des évènements (mariages, réunions, fêtes…).
-Le nom du fichier doit correspondre à celui choisi dans admin.html (onglet Nouvelles & photos).
