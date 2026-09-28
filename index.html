@@ -41,6 +41,7 @@ a.chip:hover{background:rgba(244,185,66,.2)}
 .btn:hover{transform:translateY(-2px);border-color:var(--gold-light)}
 .btn.ghost{background:transparent;box-shadow:none;border-color:rgba(255,243,214,.35);color:var(--parchment)}
 .btn.ghost:hover{border-color:var(--gold-light);color:var(--gold-light)}
+.btn:disabled{opacity:.35;cursor:default;transform:none}
 .btn.small{padding:.35rem .7rem;font-size:.85rem;border-radius:8px}
 .btn.danger{background:transparent;border-color:rgba(255,138,122,.5);color:var(--danger);box-shadow:none}
 .badge-deduit{font-family:var(--font-label);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;padding:.08rem .38rem;border-radius:4px;background:rgba(127,224,168,.14);color:var(--sage-light);margin-left:.3rem;vertical-align:middle}
@@ -620,8 +621,13 @@ var Genea = (function(){
 
     function byBirth(a, b){
       var pa = P[a], pb = P[b];
-      var ya = (pa.anneeNaissance || 9999) * 13 + (pa.moisNaissance || 0);
-      var yb = (pb.anneeNaissance || 9999) * 13 + (pb.moisNaissance || 0);
+      // 1) rang dans la fratrie fixé par l'administrateur (1 = aîné)
+      var ra = parseFloat(pa.rangNaissance), rb = parseFloat(pb.rangNaissance);
+      ra = isNaN(ra) ? Infinity : ra; rb = isNaN(rb) ? Infinity : rb;
+      if(ra !== rb) return ra < rb ? -1 : 1;
+      // 2) date de naissance, 3) ordre de saisie
+      var ya = ((pa.anneeNaissance || 9999) * 13 + (pa.moisNaissance || 0)) * 32 + (pa.jourNaissance || 0);
+      var yb = ((pb.anneeNaissance || 9999) * 13 + (pb.moisNaissance || 0)) * 32 + (pb.jourNaissance || 0);
       if(ya !== yb) return ya - yb;
       return (pa._ord || 0) - (pb._ord || 0);
     }

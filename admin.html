@@ -41,6 +41,7 @@ a.chip:hover{background:rgba(244,185,66,.2)}
 .btn:hover{transform:translateY(-2px);border-color:var(--gold-light)}
 .btn.ghost{background:transparent;box-shadow:none;border-color:rgba(255,243,214,.35);color:var(--parchment)}
 .btn.ghost:hover{border-color:var(--gold-light);color:var(--gold-light)}
+.btn:disabled{opacity:.35;cursor:default;transform:none}
 .btn.small{padding:.35rem .7rem;font-size:.85rem;border-radius:8px}
 .btn.danger{background:transparent;border-color:rgba(255,138,122,.5);color:var(--danger);box-shadow:none}
 .badge-deduit{font-family:var(--font-label);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;padding:.08rem .38rem;border-radius:4px;background:rgba(127,224,168,.14);color:var(--sage-light);margin-left:.3rem;vertical-align:middle}
@@ -527,8 +528,13 @@ var Genea = (function(){
 
     function byBirth(a, b){
       var pa = P[a], pb = P[b];
-      var ya = (pa.anneeNaissance || 9999) * 13 + (pa.moisNaissance || 0);
-      var yb = (pb.anneeNaissance || 9999) * 13 + (pb.moisNaissance || 0);
+      // 1) rang dans la fratrie fixé par l'administrateur (1 = aîné)
+      var ra = parseFloat(pa.rangNaissance), rb = parseFloat(pb.rangNaissance);
+      ra = isNaN(ra) ? Infinity : ra; rb = isNaN(rb) ? Infinity : rb;
+      if(ra !== rb) return ra < rb ? -1 : 1;
+      // 2) date de naissance, 3) ordre de saisie
+      var ya = ((pa.anneeNaissance || 9999) * 13 + (pa.moisNaissance || 0)) * 32 + (pa.jourNaissance || 0);
+      var yb = ((pb.anneeNaissance || 9999) * 13 + (pb.moisNaissance || 0)) * 32 + (pb.jourNaissance || 0);
       if(ya !== yb) return ya - yb;
       return (pa._ord || 0) - (pb._ord || 0);
     }
@@ -911,6 +917,7 @@ var UI = (function(){
       '<fieldset><legend>Appartenance</legend><div class="row c2">' +
         '<label class="f"><span>Famille (enfant de)</span><select name="familleId">' + famOptions(p.familleId) + '</select></label>' +
         '<label class="f"><span>Grande Famille</span><select name="gf">' + gfOptions(p.grandeFamilleId) + '</select></label></div>' +
+        '<div class="row c2" style="margin-top:.8rem"><label class="f"><span>Rang dans la fratrie (1 = aîné·e)</span><input type="number" name="rang" min="1" step="1" value="' + esc(p.rangNaissance || "") + '" placeholder="vide = selon la date de naissance"></label><span></span></div>' +
         '<p class="hint" id="famHint"></p></fieldset>' +
       '<fieldset><legend>Relations déclarées</legend><ul class="rel-list" id="relList"></ul>' +
         '<div class="addrel"><span class="t">Cette personne est</span><select id="rType">' + relTypeOptions("fratrie") + '</select>' +
@@ -985,6 +992,7 @@ var UI = (function(){
         moisNaissance: form.mois.value ? +form.mois.value : null,
         anneeNaissance: form.annee.value ? +form.annee.value : null,
         jourNaissance: form.jour.value && form.mois.value ? Math.min(31, Math.max(1, +form.jour.value)) : null,
+        rangNaissance: parseInt(form.rang.value, 10) > 0 ? parseInt(form.rang.value, 10) : null,
         photo: form.photo.value.trim(),
         familleId: form.familleId.value || null,
         grandeFamilleId: form.gf.value || null
@@ -1099,11 +1107,16 @@ var UI = (function(){
           '<label class="f"><span>Mère</span><div class="sel-add"><select name="mere">' + personOptions(f.mereId, function(p){ return p.sexe !== "M"; }, "— inconnue —") + '</select>' +
             '<button type="button" class="btn ghost small" id="newMere" title="Créer une nouvelle personne">+</button></div></label></div>' +
         (isNew ? '<p class="hint">Enregistrez la famille, puis ajoutez-y les enfants.</p>' :
-          '<fieldset><legend>Enfants (' + kids.length + ')</legend><ul class="rel-list">' + (kids.length ? kids.map(function(k){
-            return '<li><span style="display:flex;align-items:center;gap:.5rem">' + avatar(M.P[k], 30, photoPreviews[M.P[k].photo]) + esc(name(M.P[k])) +
+          '<fieldset><legend>Enfants (' + kids.length + ') — du plus âgé au plus jeune</legend><ul class="rel-list">' + (kids.length ? kids.map(function(k, i){
+            return '<li><span style="display:flex;align-items:center;gap:.5rem">' +
+              '<label class="ord" title="Rang dans la fratrie (1 = aîné·e)">N°<input type="number" min="1" step="1" data-rang="' + esc(k) + '" value="' + esc(M.P[k].rangNaissance || "") + '"></label>' +
+              avatar(M.P[k], 30, photoPreviews[M.P[k].photo]) + esc(name(M.P[k])) +
               (M.P[k].anneeNaissance ? ' <span class="muted">(' + M.P[k].anneeNaissance + ')</span>' : '') + '</span>' +
-              '<button type="button" class="btn ghost small" data-p="' + esc(k) + '">Modifier</button></li>';
+              '<span style="display:flex;gap:.25rem"><button type="button" class="btn ghost small" data-mv="' + i + '" data-d="-1" title="Monter (plus âgé)"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
+              '<button type="button" class="btn ghost small" data-mv="' + i + '" data-d="1" title="Descendre (plus jeune)"' + (i === kids.length - 1 ? ' disabled' : '') + '>↓</button>' +
+              '<button type="button" class="btn ghost small" data-p="' + esc(k) + '">Modifier</button></span></li>';
           }).join("") : '<li class="muted">Aucun enfant.</li>') + '</ul>' +
+          '<p class="hint" style="margin-top:.5rem">N° 1 = l\'aîné·e. Utilisez ↑ ↓ ou tapez les numéros ; sans numéro, les enfants sont classés par date de naissance.</p>' +
           '<p style="margin:.7rem 0 0"><button type="button" class="btn small" id="addKid">+ Ajouter un enfant</button></p></fieldset>') +
         '</div><div class="dlg-foot"><div>' + (isNew ? '' : '<button type="button" class="btn danger small" id="fDel">Supprimer</button>') + '</div>' +
         '<div class="r"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn" value="ok" id="fSave">Enregistrer</button></div></div></form>';
@@ -1128,6 +1141,25 @@ var UI = (function(){
       function autoNameAfter(){ var fm = dlg.querySelector("#ff"); if(fm && !nameTouched){ fm.pere.dispatchEvent(new Event("change")); } }
       var ak = dlg.querySelector("#addKid");
       if(ak) ak.onclick = function(){ keep(); saveFamily(form, true); openPerson(null, { familleId: id, onSaved: function(){ draw(); } }, true); };
+      function personRec(pid){ return DATA.personnes.filter(function(q){ return q.id === pid; })[0]; }
+      dlg.querySelectorAll("[data-rang]").forEach(function(inp){
+        inp.onchange = function(){
+          keep();
+          var n = parseInt(inp.value, 10), rec = personRec(inp.getAttribute("data-rang"));
+          rec.rangNaissance = n > 0 ? n : null;
+          commit(); render(); draw();
+        };
+      });
+      dlg.querySelectorAll("[data-mv]").forEach(function(b){
+        b.onclick = function(){
+          keep();
+          var list = M.childrenOfFamily(id), i = +b.getAttribute("data-mv"), j = i + (+b.getAttribute("data-d"));
+          if(j < 0 || j >= list.length) return;
+          var t = list[i]; list[i] = list[j]; list[j] = t;
+          list.forEach(function(k, n){ personRec(k).rangNaissance = n + 1; });  // on renumérote toute la fratrie
+          commit(); render(); draw();
+        };
+      });
       dlg.querySelectorAll("[data-p]").forEach(function(b){
         b.onclick = function(){ keep(); openPerson(b.getAttribute("data-p"), { onSaved: function(){ draw(); } }, true); };
       });

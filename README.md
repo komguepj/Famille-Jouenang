@@ -22,6 +22,7 @@ Double-cliquez simplement sur **index.html** : le site lit alors `family-data.js
    - **+ Enfant** : ajoutez les enfants avec leur prénom, nom, sexe, mois et année de naissance, et leur photo.
    - **Relations** : ajoutez seulement les liens qui ne viennent pas déjà des familles (par exemple « X est cousin de Y » quand les parents ne sont pas saisis).
    - **Ordre d'affichage** : dans l'onglet Familles, chaque carte a un champ **N°**. Le 1 s'affiche en premier sur la page principale. Les familles fondatrices restent seules sur la première rangée. À égalité de numéro, ou sans numéro, c'est l'ordre de l'arbre qui s'applique. « Renuméroter 1, 2, 3… » redonne des numéros qui se suivent, et « Ordre de l'arbre » efface tous les numéros.
+   - **Ordre des enfants** : dans la fenêtre « Modifier » d'une famille, chaque enfant a un **N°** (1 = l'aîné·e) et des flèches ↑ ↓ pour le déplacer. Le même champ, « Rang dans la fratrie », se trouve dans la fiche de chaque personne. Les enfants sans numéro sont classés par date de naissance.
 3. Cliquez sur **Aperçu du site** pour voir le résultat avant de le publier.
 4. Cliquez sur **⬇ Exporter les données**. Deux fichiers sont téléchargés, `family-data.json` et `family-data.js` : remplacez les anciens par ceux-ci. Si le navigateur le demande, autorisez les téléchargements multiples.
 5. Copiez les nouvelles photos dans le dossier `photos/`. Le nom du fichier doit être le même que celui indiqué dans la fiche.
