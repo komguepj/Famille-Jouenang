@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Famille Jouenang — Musée Généalogique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --sky:#EAF6FF;
+  --sky-deep:#DCEEFA;
+  --card:#FFFFFF;
+  --ink:#1E293B;
+  --ink-soft:#5B6B82;
+  --line:#94A0B4;
+  --gold:#B8863B;
+  --gold-soft:#E8D4AC;
+  --ring-m:#C97B84;   /* branche Martine — terracotta rosé */
+  --ring-c:#5E8B7E;   /* branche Cécile — vert sauge */
+  --radius:18px;
+  --shadow:0 10px 30px -12px rgba(30,41,59,.18);
+  --font-display:'Fraunces', serif;
+  --font-body:'Inter', sans-serif;
+}
+html.dark{
+  --sky:#0B1220;
+  --sky-deep:#0F1B2E;
+  --card:#141F33;
+  --ink:#EAF1FB;
+  --ink-soft:#9AACC7;
+  --line:#3B4A63;
+  --gold:#E4B667;
+  --gold-soft:#3A2F1C;
+  --shadow:0 10px 30px -12px rgba(0,0,0,.55);
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--font-body);transition:background .35s ease,color .35s ease;}
+h1,h2,h3,.display{font-family:var(--font-display);}
+a{color:inherit;}
+button{font-family:var(--font-body);}
+::selection{background:var(--gold-soft);}
+
+/* ============ TOP BAR ============ */
+.topbar{
+  position:sticky; top:0; z-index:40;
+  display:flex; align-items:center; gap:18px;
+  padding:14px 26px; background:color-mix(in srgb, var(--sky) 88%, transparent);
+  backdrop-filter:blur(10px); border-bottom:1px solid color-mix(in srgb, var(--line) 35%, transparent);
+}
+.brand{display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none;}
+.crest{width:38px; height:38px; border-radius:50%; background:conic-gradient(from 220deg, var(--gold), var(--ring-m), var(--ring-c), var(--gold)); display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow);}
+.crest span{width:28px; height:28px; border-radius:50%; background:var(--card); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; font-size:13px;}
+.brand-text{line-height:1.1;}
+.brand-text .t1{font-family:var(--font-display); font-weight:600; font-size:17px;}
+.brand-text .t2{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft);}
+
+.search-wrap{position:relative; flex:1; max-width:420px;}
+.search-wrap input{
+  width:100%; padding:10px 14px 10px 38px; border-radius:999px; border:1px solid color-mix(in srgb, var(--line) 45%, transparent);
+  background:var(--card); color:var(--ink); font-size:14px; outline:none; transition:box-shadow .2s;
+}
+.search-wrap input:focus{box-shadow:0 0 0 3px color-mix(in srgb, var(--gold) 30%, transparent);}
+.search-wrap svg{position:absolute; left:13px; top:50%; transform:translateY(-50%); opacity:.55;}
+.search-results{
+  position:absolute; top:calc(100% + 8px); left:0; right:0; background:var(--card); border-radius:14px; box-shadow:var(--shadow);
+  overflow:hidden; display:none; max-height:320px; overflow-y:auto; border:1px solid color-mix(in srgb, var(--line) 30%, transparent);
+}
+.search-results.show{display:block;}
+.search-item{padding:10px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-size:14px;}
+.search-item:hover{background:var(--sky-deep);}
+.search-item small{color:var(--ink-soft); font-size:11px;}
+
+.topbar-actions{display:flex; align-items:center; gap:8px; margin-left:auto;}
+.icon-btn{
+  display:flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%;
+  border:1px solid color-mix(in srgb, var(--line) 40%, transparent); background:var(--card); cursor:pointer; color:var(--ink);
+  transition:transform .15s ease, background .2s;
+}
+.icon-btn:hover{transform:translateY(-2px); background:var(--sky-deep);}
+.pill-btn{
+  display:flex; align-items:center; gap:6px; padding:9px 16px; border-radius:999px; border:1px solid color-mix(in srgb, var(--line) 40%, transparent);
+  background:var(--card); cursor:pointer; font-size:13px; font-weight:600; color:var(--ink); transition:transform .15s, background .2s;
+}
+.pill-btn:hover{transform:translateY(-2px); background:var(--sky-deep);}
+.pill-btn.gold{background:var(--gold); color:#fff; border-color:var(--gold);}
+.pill-btn.gold:hover{filter:brightness(1.06);}
+
+/* ============ HERO ============ */
+.hero{padding:56px 26px 20px; text-align:center;}
+.hero .eyebrow{font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); font-weight:600;}
+.hero h1{font-size:clamp(32px,5vw,52px); margin:10px 0 12px; font-weight:600;}
+.hero p{color:var(--ink-soft); max-width:560px; margin:0 auto; font-size:15px; line-height:1.6;}
+
+.stats-row{display:flex; flex-wrap:wrap; justify-content:center; gap:14px; margin:30px auto 10px; max-width:900px;}
+.stat-chip{background:var(--card); border-radius:14px; padding:12px 20px; box-shadow:var(--shadow); text-align:center; min-width:110px;}
+.stat-chip .n{font-family:var(--font-display); font-size:22px; font-weight:700; color:var(--gold);}
+.stat-chip .l{font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em;}
+
+/* ============ TREE ============ */
+.tree-wrapper{overflow:auto; padding:50px 24px 100px; -webkit-overflow-scrolling:touch; display:flex; flex-direction:column; align-items:center;}
+.tree-hint{text-align:center; font-size:12px; color:var(--ink-soft); margin-bottom:18px;}
+ul.tree, ul.tree ul{
+  padding-top:34px; position:relative; display:flex; justify-content:center; list-style:none; margin:0; width:max-content;
+}
+ul.tree{padding-top:0; margin:0 auto; align-self:center;}
+ul.tree li{
+  display:flex; flex-direction:column; align-items:center; position:relative; padding:34px 18px 0;
+}
+ul.tree li::before, ul.tree li::after{
+  content:''; position:absolute; top:0; right:50%; border-top:2px solid var(--line); width:50%; height:34px;
+}
+ul.tree li::after{right:auto; left:50%; border-left:2px solid var(--line);}
+ul.tree li:only-child::after, ul.tree li:only-child::before{display:none;}
+ul.tree li:only-child{padding-top:0;}
+ul.tree li:first-child::before{border:0 none;}
+ul.tree li:last-child::after{border:0 none;}
+ul.tree li:first-child::after{border-radius:8px 0 0 0;}
+ul.tree li:last-child::before{border-right:2px solid var(--line); border-radius:0 8px 0 0;}
+ul.tree ul::before{content:''; position:absolute; top:0; left:50%; border-left:2px solid var(--line); width:0; height:34px;}
+ul.tree > li{padding-top:0;}
+
+.marriage-link{
+  position:absolute; top:14px; left:50%; transform:translate(-50%,-50%); background:var(--sky); border:2px solid var(--line);
+  color:var(--ink-soft); border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:11px;
+}
+
+/* person card */
+.card{
+  background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px 16px 12px;
+  width:150px; text-align:center; transition:transform .2s ease, box-shadow .2s ease; position:relative;
+}
+.card.clickable{cursor:pointer;}
+.card.clickable:hover{transform:translateY(-5px); box-shadow:0 16px 34px -12px rgba(30,41,59,.28);}
+.card.root{width:170px;}
+.card.spouse-in{border:1.5px dashed color-mix(in srgb, var(--line) 60%, transparent); background:color-mix(in srgb, var(--card) 92%, var(--sky-deep));}
+.avatar{
+  width:64px; height:64px; border-radius:50%; margin:0 auto 8px; display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-weight:600; font-size:19px; color:#fff; box-shadow:0 4px 10px rgba(0,0,0,.15);
+  border:3px solid var(--card); outline:2px solid var(--branch-color, var(--gold));
+}
+img.avatar, img.avatar-lg{object-fit:cover; background:var(--sky-deep);}
+.card.root .avatar{width:76px; height:76px; font-size:22px;}
+.card .name{font-size:13.5px; font-weight:600; line-height:1.25;}
+.card .years{font-size:11px; color:var(--ink-soft); margin-top:2px;}
+.card .tag{
+  display:inline-block; margin-top:6px; font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; font-weight:700;
+  padding:2px 8px; border-radius:999px; color:#fff;
+}
+.card.highlight{animation:pulseGlow 1.6s ease 2;}
+@keyframes pulseGlow{
+  0%{box-shadow:0 0 0 0 color-mix(in srgb, var(--gold) 65%, transparent);}
+  70%{box-shadow:0 0 0 16px transparent;}
+  100%{box-shadow:0 0 0 0 transparent;}
+}
+
+/* ============ PROFILE PAGE ============ */
+.profile{max-width:980px; margin:0 auto; padding:30px 22px 90px;}
+.breadcrumb-nav{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:26px;}
+.profile-header{
+  background:var(--card); border-radius:24px; box-shadow:var(--shadow); padding:38px 34px; display:flex; gap:30px; align-items:center; flex-wrap:wrap;
+}
+.profile-header .avatar-lg{
+  width:126px; height:126px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; color:#fff;
+  font-family:var(--font-display); font-size:38px; font-weight:700; box-shadow:0 8px 20px rgba(0,0,0,.18); border:5px solid var(--card); outline:3px solid var(--branch-color,var(--gold));
+}
+.profile-header .info h1{margin:0 0 4px; font-size:28px; font-weight:600;}
+.profile-header .info .prof{color:var(--gold); font-weight:600; font-size:13.5px; margin-bottom:10px;}
+.meta-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:8px 22px; font-size:13px; color:var(--ink-soft); margin-top:6px;}
+.meta-grid b{color:var(--ink); font-weight:600;}
+.memoriam{display:inline-flex; align-items:center; gap:6px; margin-top:10px; font-size:12px; padding:4px 12px; border-radius:999px; background:var(--gold-soft); color:var(--gold); font-weight:700;}
+
+.section-title{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); font-weight:700; margin:40px 0 14px;}
+.bio-box{background:var(--card); border-radius:20px; box-shadow:var(--shadow); padding:26px 30px; font-size:14.5px; line-height:1.75; color:var(--ink-soft);}
+
+.family-position{background:var(--card); border-radius:20px; box-shadow:var(--shadow); padding:26px 30px; display:grid; grid-template-columns:1fr; gap:24px;}
+.family-position h4{margin:0 0 10px; font-size:13px; color:var(--gold); text-transform:uppercase; letter-spacing:.06em;}
+.chip-list{display:flex; flex-wrap:wrap; gap:8px;}
+.chip{
+  background:var(--sky-deep); padding:7px 13px; border-radius:999px; font-size:13px; display:flex; align-items:center; gap:6px; cursor:pointer;
+  transition:transform .15s;
+}
+.chip:hover{transform:translateY(-2px);}
+.chip.self{background:var(--gold); color:#fff; cursor:default;}
+.chip.self:hover{transform:none;}
+
+.descendance-wrap{overflow-x:auto; padding:30px 10px 10px;}
+
+.siblings-nav{display:flex; justify-content:space-between; align-items:center; gap:14px; margin-top:40px; flex-wrap:wrap;}
+
+/* ============ FOOTER SECTIONS ============ */
+.extra-section{max-width:1100px; margin:0 auto; padding:10px 26px 60px;}
+.extra-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px; margin-top:16px;}
+.extra-card{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:20px 22px;}
+.extra-card h3{margin:0 0 6px; font-size:15px;}
+.extra-card p{margin:0; font-size:13px; color:var(--ink-soft); line-height:1.6;}
+
+.site-footer{text-align:center; padding:30px; color:var(--ink-soft); font-size:12px;}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:640px){
+  .topbar{flex-wrap:wrap; padding:12px 14px;}
+  .search-wrap{order:3; max-width:100%; width:100%;}
+  .profile-header{padding:26px 20px;}
+  .family-position{grid-template-columns:1fr;}
+}
+
+/* ============ PRINT ============ */
+@media print{
+  .topbar, .hero .eyebrow ~ *, .no-print{display:none !important;}
+  body{background:#fff;}
+  .tree-wrapper{overflow:visible; padding:0;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand" onclick="navigate('/')">
+    <div class="crest"><span>JJ</span></div>
+    <div class="brand-text">
+      <div class="t1">Famille Jouenang</div>
+      <div class="t2">Musée généalogique</div>
+    </div>
+  </div>
+
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input id="searchInput" type="text" placeholder="Rechercher un membre de la famille…" autocomplete="off" />
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
+  <div class="topbar-actions">
+    <button class="icon-btn no-print" title="Imprimer l'arbre" onclick="window.print()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    </button>
+    <button class="icon-btn no-print" title="Télécharger en PNG" onclick="exportPNG()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    </button>
+    <button class="icon-btn no-print" title="Mode clair / sombre" onclick="toggleDark()" id="darkBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.2" y1="4.2" x2="5.6" y2="5.6"/><line x1="18.4" y1="18.4" x2="19.8" y2="19.8"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.2" y1="19.8" x2="5.6" y2="18.4"/><line x1="18.4" y1="5.6" x2="19.8" y2="4.2"/></svg>
+    </button>
+  </div>
+</div>
+
+<div id="app"></div>
+
+<footer class="site-footer">Réalisé avec 💛 pour préserver la mémoire de la famille Jouenang — données modifiables via <code>DATA</code> dans le code source.</footer>
+
+<script>
+/* =========================================================
+   DONNÉES — tout provient de cette structure, à l'image du
+   fichier JSON demandé dans le prompt (remplacez librement).
+   ========================================================= */
+const ANCESTOR = {
+  id:'jouenang-abel', nom:'Jouenang Abel', naissance:1934, deces:2009,  photo:'photos/Abel.jpg',
+  lieuNaissance:'Batoufam, Cameroun', profession:"Policier", 
+};
+
+const WIVES = [
+  {id:'menzefo-martine', nom:'Menzefo Martine', naissance:1936, deces:1973, photo:'photos/Martine.jpg', lieuNaissance:'Bandjoun, Cameroun', branch:'m'},
+  {id:'miyou-cecile', nom:'Miyou Cécile', naissance:1952, deces:null, photo:'photos/Cecile.jpg', lieuNaissance:'Bafoussam, Cameroun', branch:'c'}
+];
+
+// génération 2 — chaque personne possède sa propre fiche
+const GEN2 = [
+  {id:'gilbert-jouenang', nom:'Gilbert Justin Jouenang', mere:'menzefo-martine', branch:'m',  photo:'photos/Gilbert.jpg',
+    profession:'Technicien de génie-civil', naissance:1958, deces:2026, lieuNaissance:'Banka, Cameroun', lieuResidence:'Bafoussam, Cameroun',
+    bio:"Aîné de la famille, Gilbert a marqué la fratrie par son sens de l'organisation. Après des études en génie-civil, il a travaillé à Bafia, Ngoumou, Akonolinga et Bafoussam, ainsi que sur de nombreux chantiers de génie-civil à travers le Cameroun .",
+    conjoint:{nom:'Marie Chimi', naissance:1962},
+    enfants:['Djomo Kamnang Arlette Nina','Jouenang Kamnang Yannick Valère','Piegouong Kamnang Brice','Menzefo Kamnang Ines','Loe Kamnang Ange Dany','Wakam Kamnang Darlène']},
+  {id:'jean-lebel-jouenang', nom:'Jean-Lebel Ngopnang Jouenang', mere:'menzefo-martine', branch:'m',  photo:'photos/Jean-lebel.jpg',
+    profession:'Ingénieur électro-mécanicien', naissance:1962, deces:null, lieuNaissance:'Yaoundé, Cameroun', lieuResidence:'Douala, Cameroun',
+    bio:"Jean-Lebel a consacré sa carrière aux télécommunication et conseils. Reconnu pour sa patience, il a a contribué à plusieurs projets de télécommunications partout dans le monde et continue de guider des entreprises avec ses conseils stratégiques.",
+    conjoint:{nom:'Caroline Ketcheuzeu Wandji', naissance:1964},
+    enfants:['Menzefo Ngopnang Nélaine Dalhia','Ketcheuzeu Ngopnang Hanry Wilson','Ngopnang Ngopnang Johanna']},
+  {id:'berthine-jouenang', nom:'Berthine Tchatchouang Jouenang', mere:'menzefo-martine', branch:'m', photo:'photos/Berthine.jpg',
+    profession:'Commerçante', naissance:1964, deces:null, lieuNaissance:'Yaoundé, Cameroun', lieuResidence:'Maryland, États-Unis',
+    bio:"Berthine dirige depuis plus de vingt ans un commerce de tissus reconnu à Bafoussam, où elle a su transmettre le sens des affaires à ses enfants.",
+    conjoint:{nom:'Joseph Fokoua', naissance:null},
+    enfants:['Fotso Fokoua Kévin','Massudom Fokoua Marlène','Menzefo Fokoua Guilène', 'Test']},
+  {id:'dagobert-jouenang', nom:'Dagobert Jouenang', mere:'menzefo-martine', branch:'m',  photo:'photos/Dagobert.jpg',
+    profession:'Agriculteur', naissance:1966, deces:null, lieuNaissance:'Bandjoun, Cameroun', lieuResidence:'Bandjoun, Cameroun',
+    bio:"Resté fidèle à la terre familiale, Dagobert a modernisé l'exploitation agricole héritée de son père. Il s'est éteint en 2015, laissant un héritage précieux à ses enfants.",
+    conjoint:{nom:'Laure', naissance:null},
+    enfants:['Grâce','Gloria']},
+  {id:'claude-jouenang', nom:'Claude Jouenang', mere:'menzefo-martine', branch:'m',  photo:'photos/Claude.jpg',
+    profession:'MédecinAgro-alimentaire', naissance:1968, deces:null, lieuNaissance:'Bandjoun, Cameroun', lieuResidence:'Paris, France',
+    bio:"Claude a poursuivi ses études de médecine en France, où il exerce aujourd'hui comme médecin généraliste tout en restant très attaché à ses racines camerounaises.",
+    conjoint:{nom:'Jeanine', naissance:1969},
+    enfants:['Stéphane','Pharel','Carel','Allan']},
+  {id:'jules-jouenang', nom:'Jules Komguep Jouenang', mere:'menzefo-martine', branch:'m',  photo:'photos/Jules.jpg',
+    profession:'Avocat', naissance:1970, deces:null, lieuNaissance:'Bandjoun, Cameroun', lieuResidence:'Montréal, Canada',
+    bio:"Benjamin de la première épouse, Jules a émigré au Canada où il exerce le droit des affaires. Il reste un point de repère pour la diaspora familiale en Amérique du Nord.",
+    conjoint:{nom:'Claire Ngantcha', naissance:null},
+    enfants:['Steve','Ornela','Ivika','Lorick']},
+
+  {id:'alain-jouenang', nom:'Alain Jouenang', mere:'miyou-cecile', branch:'c',  photo:'photos/Padre.jpg',
+    profession:'Musicien', naissance:1975, deces:null, lieuNaissance:'Bafoussam, Cameroun', lieuResidence:'Bafoussam, Cameroun',
+    bio:"Alain a fait de la musique traditionnelle sa passion. Célibataire, il consacre son temps à la formation de jeunes artistes de sa région.",
+    conjoint:null, enfants:[]},
+  {id:'valerie-jouenang', nom:'Valérie Jouenang', mere:'miyou-cecile', branch:'c',  photo:'photos/Valerie.jpg',
+    profession:'Infirmière', naissance:1978, deces:null, lieuNaissance:'Bafoussam, Cameroun', lieuResidence:'Douala, Cameroun',
+    bio:"Valérie exerce comme infirmière dans un hôpital de Douala. Très proche de ses neveux et nièces, elle joue un rôle central dans les réunions familiales.",
+    conjoint:null, enfants:[]},
+  {id:'bertin-jouenang', nom:'Bertin Jouenang', mere:'miyou-cecile', branch:'c',  photo:'photos/Bertin.jpg',
+    profession:'Entrepreneur', naissance:1982, deces:null, lieuNaissance:'Bafoussam, Cameroun', lieuResidence:'Bafoussam, Cameroun',
+    bio:"Bertin a repris et développé les activités commerciales de la famille du côté maternel, en y ajoutant une branche d'import-export.",
+    conjoint:{nom:'Gisèle', naissance:null},
+    enfants:['Christelle','Armand','Vanessa']},
+  {id:'nadege-jouenang', nom:'Nadège Jouenang', mere:'miyou-cecile', branch:'c',  photo:'photos/Nadege.jpg',
+    profession:'Pharmacienne', naissance:1984, deces:null, lieuNaissance:'Bafoussam, Cameroun', lieuResidence:'Yaoundé, Cameroun',
+    bio:"Nadège tient une pharmacie à Yaoundé. Dynamique et généreuse, elle organise chaque année les retrouvailles familiales.",
+    conjoint:{nom:'Robert Essomba', naissance:1975},
+    enfants:['Aline','Boris','Cédric','Prisca']},
+  {id:'sylvia-jouenang', nom:'Sylvia Jouenang', mere:'miyou-cecile', branch:'c',  photo:'photos/Sylvia.jpg',
+    profession:'Étudiante en droit', naissance:1986, deces:null, lieuNaissance:'Bafoussam, Cameroun', lieuResidence:'Bafoussam, Cameroun',
+    bio:"Benjamine de la fratrie, Sylvia poursuit actuellement des études supérieures en droit tout en s'impliquant dans les archives familiales.",
+    conjoint:null, enfants:[]},
+  {id:'alvine-jouenang', nom:'Alvine Jouenang', mere:'miyou-cecile', branch:'c',  photo:'photos/Alvine.jpg',
+    profession:"Styliste", naissance:1988, deces:null, lieuNaissance:'Bafoussam, Cameroun', lieuResidence:'Douala, Cameroun',
+    bio:"Alvine a fondé sa propre maison de couture à Douala, mêlant motifs traditionnels et créations contemporaines.",
+    conjoint:{nom:'xx', naissance:null},
+    enfants:['Franck-Patrick']}
+];
+
+/* =========================================================
+   OUTILS
+   ========================================================= */
+const byId = id => GEN2.find(p=>p.id===id);
+const wifeOf = mereId => WIVES.find(w=>w.id===mereId);
+const siblingsOf = p => GEN2.filter(x=>x.mere===p.mere);
+const initials = name => name.split(' ').filter(w=>w[0]===w[0].toUpperCase()).slice(0,2).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+const branchColor = b => b==='m' ? 'var(--ring-m)' : (b==='c' ? 'var(--ring-c)' : 'var(--gold)');
+const yearsLabel = p => p.deces ? `${p.naissance} – ${p.deces}` : `Né${p.nom && p.nom.match(/e$/)?'e':''} en ${p.naissance}`;
+
+function avatarStyle(nom, branch){
+  const hue = [...nom].reduce((a,c)=>a+c.charCodeAt(0),0) % 360;
+  return `background:linear-gradient(135deg, hsl(${hue} 55% 55%), hsl(${(hue+40)%360} 55% 42%)); --branch-color:${branchColor(branch)};`;
+}
+
+// Rend soit une vraie photo (<img>), soit un avatar généré (initiales), avec repli
+// automatique vers l'avatar si l'image ne charge pas (lien cassé, fichier manquant…).
+function renderAvatar(nom, photo, branch, sizeClass){
+  const style = avatarStyle(nom, branch);
+  if(photo){
+    return `<img class="${sizeClass} photo-img" src="${photo}" alt="${nom}" loading="lazy"
+      data-size-class="${sizeClass}" data-fallback-style="${style.replace(/"/g,'&quot;')}" data-initials="${initials(nom)}" />`;
+  }
+  return `<div class="${sizeClass}" style="${style}">${initials(nom)}</div>`;
+}
+document.addEventListener('error', function(e){
+  const img = e.target;
+  if(img.tagName === 'IMG' && img.classList.contains('photo-img')){
+    const div = document.createElement('div');
+    div.className = img.dataset.sizeClass;
+    div.setAttribute('style', img.dataset.fallbackStyle);
+    div.textContent = img.dataset.initials;
+    img.replaceWith(div);
+  }
+}, true);
+
+/* =========================================================
+   ROUTAGE
+   ========================================================= */
+function navigate(path){ location.hash = path; }
+window.addEventListener('hashchange', render);
+window.addEventListener('DOMContentLoaded', ()=>{ render(); setupSearch(); });
+
+function render(){
+  const hash = location.hash.replace('#','') || '/';
+  const app = document.getElementById('app');
+  if(hash.startsWith('/personne/')){
+    const id = hash.split('/personne/')[1];
+    const person = byId(id);
+    if(person){ app.innerHTML = renderProfilePage(person); attachProfileEvents(person); window.scrollTo({top:0,behavior:'smooth'}); return; }
+  }
+  app.innerHTML = renderHome();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* =========================================================
+   PAGE D'ACCUEIL / ARBRE
+   ========================================================= */
+function renderHome(){
+  const totalEnfants3 = GEN2.reduce((a,p)=>a+p.enfants.length,0);
+  const couples = GEN2.filter(p=>p.conjoint).length + WIVES.length;
+  const vivants = GEN2.filter(p=>!p.deces).length;
+
+  return `
+  <section class="hero">
+    <div class="eyebrow">Depuis ${ANCESTOR.naissance}</div>
+    <h1 class="display">L'histoire de la Famille Jouenang</h1>
+    <p>Trois générations, deux branches, une même racine. Explorez l'arbre, cliquez sur un nom de la 2ᵉ génération pour découvrir son parcours et sa descendance.</p>
+    <div class="stats-row">
+      <div class="stat-chip"><div class="n">3</div><div class="l">Générations</div></div>
+      <div class="stat-chip"><div class="n">${GEN2.length}</div><div class="l">Enfants (2ᵉ gén.)</div></div>
+      <div class="stat-chip"><div class="n">${totalEnfants3}</div><div class="l">Petits-enfants</div></div>
+      <div class="stat-chip"><div class="n">${couples}</div><div class="l">Unions</div></div>
+      <div class="stat-chip"><div class="n">${vivants}</div><div class="l">Membres vivants (2ᵉ gén.)</div></div>
+    </div>
+  </section>
+
+  <div class="tree-wrapper" id="treeWrapper">
+    <div class="tree-hint">↔ Faites défiler horizontalement · ↕ verticalement pour explorer l'arbre complet</div>
+    <ul class="tree" id="treeRoot">
+      <li>
+        ${personCard(ANCESTOR,'root',null,false)}
+        <ul>
+          ${WIVES.map(w=>`
+          <li>
+            <div class="marriage-link" title="Union">💍</div>
+            ${personCard(w,'spouse-in',w.branch,false)}
+            <ul>
+              ${GEN2.filter(p=>p.mere===w.id).map(p=>`<li>${personCard(p,'clickable',p.branch,true)}</li>`).join('')}
+            </ul>
+          </li>`).join('')}
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="extra-section">
+    <div class="section-title">À explorer</div>
+    <div class="extra-grid">
+      <div class="extra-card">
+        <h3>📷 Galerie familiale</h3>
+        <p>Chaque fiche accueille les photographies du membre concerné (avatar généré en l'absence de photo). Ajoutez vos images en remplaçant les avatars dans les données.</p>
+      </div>
+      <div class="extra-card">
+        <h3>🕰️ Chronologie</h3>
+        <p>De ${ANCESTOR.naissance} (naissance du patriarche) à aujourd'hui : ${new Date().getFullYear()-ANCESTOR.naissance} ans d'histoire familiale à travers ${GEN2.length + WIVES.length + 1} membres documentés.</p>
+      </div>
+      <div class="extra-card">
+        <h3>🕊️ Hommages</h3>
+        <p>${[ANCESTOR,...WIVES,...GEN2].filter(p=>p.deces).map(p=>p.nom).join(' · ')} — en mémoire des membres disparus, dont l'héritage continue de vivre à travers leurs descendants.</p>
+      </div>
+      <div class="extra-card">
+        <h3>🎂 Anniversaires</h3>
+        <p>${GEN2.filter(p=>!p.deces).map(p=>p.nom.split(' ')[0]).join(' · ')} — pensez à célébrer chaque génération présente.</p>
+      </div>
+    </div>
+  </div>`;
+}
+
+function personCard(p, kind, branch, clickable){
+  const onclick = clickable ? `onclick="navigate('/personne/${p.id}')"` : '';
+  return `
+  <div class="card ${kind==='root'?'root':''} ${kind==='spouse-in'?'spouse-in':''} ${clickable?'clickable':''}" data-name="${p.nom.toLowerCase()}" data-id="${p.id||''}" ${onclick}>
+    ${renderAvatar(p.nom, p.photo, branch, 'avatar')}
+    <div class="name">${p.nom}</div>
+    <div class="years">${p.naissance ? yearsLabel(p) : ''}</div>
+  </div>`;
+}
+
+/* =========================================================
+   PAGE INDIVIDUELLE
+   ========================================================= */
+function renderProfilePage(p){
+  const wife = wifeOf(p.mere);
+  const sibs = siblingsOf(p).filter(s=>s.id!==p.id);
+  const idx = siblingsOf(p).findIndex(s=>s.id===p.id);
+  const group = siblingsOf(p);
+  const prev = group[(idx-1+group.length)%group.length];
+  const next = group[(idx+1)%group.length];
+
+  return `
+  <div class="profile">
+    <div class="breadcrumb-nav no-print">
+      <button class="pill-btn" onclick="navigate('/')">← Retour à l'arbre complet</button>
+      <button class="pill-btn" onclick="navigate('/'); setTimeout(()=>highlightCard('${wife.id}'),150)">Voir les parents</button>
+    </div>
+
+    <div class="profile-header">
+      ${renderAvatar(p.nom, p.photo, p.branch, 'avatar-lg')}
+      <div class="info">
+        <h1 class="display">${p.nom}</h1>
+        <div class="prof">${p.profession || ''}</div>
+        ${p.deces ? `<div class="memoriam">🕊️ En mémoire — ${p.naissance}–${p.deces}</div>` : ''}
+        <div class="meta-grid">
+          <div><b>Naissance</b><br>${p.naissance}${p.deces?` — Décès : ${p.deces}`:''}</div>
+          <div><b>Lieu de naissance</b><br>${p.lieuNaissance}</div>
+          <div><b>Lieu de résidence</b><br>${p.lieuResidence}</div>
+          <div><b>Branche</b><br>${p.branch==='m'?'Menzefo Martine':'Miyou Cécile'}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Biographie</div>
+    <div class="bio-box">${p.bio}</div>
+
+    <div class="section-title">Position dans la famille</div>
+    <div class="family-position">
+      <div>
+        <h4>Parents</h4>
+        <div class="chip-list">
+          <div class="chip" onclick="navigate('/')">👤 ${ANCESTOR.nom}</div>
+          <div class="chip" onclick="navigate('/')">👤 ${wife.nom}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Descendance</div>
+    <div class="descendance-wrap">
+      ${renderDescendanceTree(p)}
+    </div>
+
+    <div class="siblings-nav no-print">
+      <button class="pill-btn" onclick="navigate('/personne/${prev.id}')">← ${prev.nom.split(' ')[0]}</button>
+      <button class="pill-btn gold" onclick="navigate('/')">🌳 Arbre complet</button>
+      <button class="pill-btn" onclick="navigate('/personne/${next.id}')">${next.nom.split(' ')[0]} →</button>
+    </div>
+  </div>`;
+}
+
+function renderDescendanceTree(p){
+  const enfantNom = e => (typeof e === 'string') ? e : e.nom;
+  const enfantPhoto = e => (typeof e === 'string') ? null : e.photo;
+  const conjointNode = p.conjoint ? `
+    <li>
+      <div class="marriage-link">💍</div>
+      <div class="card spouse-in">
+        ${renderAvatar(p.conjoint.nom, p.conjoint.photo, null, 'avatar')}
+        <div class="name">${p.conjoint.nom}</div>
+        <div class="years">Conjoint(e)</div>
+      </div>
+      ${p.enfants.length ? `<ul>${p.enfants.map(e=>`<li><div class="card">${renderAvatar(enfantNom(e), enfantPhoto(e), null, 'avatar')}<div class="name">${enfantNom(e)}</div><div class="years">3ᵉ génération</div></div></li>`).join('')}</ul>` : ''}
+    </li>` : `<li><div class="card" style="opacity:.6;"><div class="years">Célibataire, sans enfant</div></div></li>`;
+
+  return `
+  <ul class="tree">
+    <li>
+      <div class="card root" style="width:150px;">
+        ${renderAvatar(p.nom, p.photo, p.branch, 'avatar')}
+        <div class="name">${p.nom.split(' ')[0]}</div>
+        <div class="years">Lui / Elle</div>
+      </div>
+      <ul>${conjointNode}</ul>
+    </li>
+  </ul>
+  ${!p.enfants.length && !p.conjoint ? '' : ''}
+  `;
+}
+
+function attachProfileEvents(){ /* réservé pour extensions futures */ }
+
+/* =========================================================
+   RECHERCHE
+   ========================================================= */
+function setupSearch(){
+  const input = document.getElementById('searchInput');
+  const results = document.getElementById('searchResults');
+  const all = [ANCESTOR, ...WIVES, ...GEN2];
+
+  input.addEventListener('input', ()=>{
+    const q = input.value.trim().toLowerCase();
+    if(!q){ results.classList.remove('show'); results.innerHTML=''; return; }
+    const matches = all.filter(p=>p.nom.toLowerCase().includes(q)).slice(0,8);
+    if(!matches.length){ results.innerHTML = '<div class="search-item">Aucun résultat</div>'; results.classList.add('show'); return; }
+    results.innerHTML = matches.map(p=>{
+      const isGen2 = GEN2.includes(p);
+      return `<div class="search-item" data-id="${p.id}" data-nav="${isGen2}">
+        <span>${p.nom}</span><small>${isGen2 ? '· fiche disponible' : ''}</small>
+      </div>`;
+    }).join('');
+    results.classList.add('show');
+  });
+
+  results.addEventListener('click', (e)=>{
+    const item = e.target.closest('.search-item');
+    if(!item || !item.dataset.id) return;
+    const id = item.dataset.id;
+    const goToProfile = item.dataset.nav === 'true';
+    results.classList.remove('show');
+    input.value = '';
+    if(goToProfile){ navigate('/personne/'+id); }
+    else{ navigate('/'); setTimeout(()=>highlightCard(id),150); }
+  });
+
+  document.addEventListener('click', (e)=>{
+    if(!e.target.closest('.search-wrap')) results.classList.remove('show');
+  });
+}
+
+function highlightCard(id){
+  const card = document.querySelector(`.card[data-id="${id}"]`);
+  if(!card) return;
+  card.scrollIntoView({behavior:'smooth', block:'center', inline:'center'});
+  card.classList.add('highlight');
+  setTimeout(()=>card.classList.remove('highlight'), 3200);
+}
+
+/* =========================================================
+   MODE SOMBRE / CLAIR
+   ========================================================= */
+function toggleDark(){
+  document.documentElement.classList.toggle('dark');
+}
+
+/* =========================================================
+   EXPORT PNG (via html2canvas, chargé à la demande)
+   ========================================================= */
+function exportPNG(){
+  const target = document.getElementById('treeWrapper') || document.querySelector('.profile');
+  if(!target){ return; }
+  const finish = ()=>{
+    window.html2canvas(target, {backgroundColor:getComputedStyle(document.body).backgroundColor, scale:2}).then(canvas=>{
+      const link = document.createElement('a');
+      link.download = 'arbre-genealogique-jouenang.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  };
+  if(window.html2canvas){ finish(); return; }
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+  script.onload = finish;
+  document.head.appendChild(script);
+}
+</script>
+</body>
+</html>
