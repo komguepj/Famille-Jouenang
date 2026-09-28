@@ -63,7 +63,7 @@ main{max-width:1200px;margin:0 auto;padding:0 1.25rem 4rem}
 .panel-head h2{margin:0;font-family:var(--font-display);font-weight:600;font-size:1.3rem}
 .help{font-size:.88rem;color:var(--parchment-2);margin:.2rem 0 1rem;max-width:760px}
 
-input[type=text],input[type=number],input[type=search],select,textarea{width:100%;padding:.55rem .7rem;border-radius:8px;border:1px solid var(--line);background:rgba(0,0,0,.22);color:var(--ivory)}
+input[type=text],input[type=number],input[type=search],input[type=date],select,textarea{color-scheme:dark;width:100%;padding:.55rem .7rem;border-radius:8px;border:1px solid var(--line);background:rgba(0,0,0,.22);color:var(--ivory)}
 select option,select optgroup{background:#12492a;color:var(--ivory)}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--gold);outline-offset:1px}
 label.f{display:flex;flex-direction:column;gap:.3rem;font-size:.8rem;color:var(--parchment-2)}
@@ -71,6 +71,7 @@ label.f>span{font-family:var(--font-label);font-size:.64rem;letter-spacing:.1em;
 .row{display:grid;gap:.8rem}
 .row.c2{grid-template-columns:1fr 1fr}
 .row.c3{grid-template-columns:1fr 1fr 1fr}
+.row.c4{grid-template-columns:1.3fr .7fr 1fr 1fr}
 .filters{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.9rem}
 .filters>*{flex:1 1 200px;width:auto}
 
@@ -123,11 +124,28 @@ legend{font-family:var(--font-label);font-size:.64rem;letter-spacing:.14em;text-
 .issues{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.35rem;font-size:.9rem}
 .issues li{padding:.45rem .7rem;border-radius:8px;background:rgba(244,185,66,.1);border-left:3px solid var(--gold)}
 .issues li.ok{background:rgba(127,224,168,.1);border-color:var(--sage-light)}
+.nlist{display:flex;flex-direction:column;gap:.6rem}
+.nitem{display:flex;gap:.9rem;align-items:center;padding:.6rem .7rem;border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.12);cursor:pointer;text-align:left;color:inherit;width:100%}
+.nitem:hover{border-color:var(--gold-light)}
+.nitem .th{width:90px;height:64px;flex:none;border-radius:8px;overflow:hidden;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;color:var(--gold-light);font-size:.7rem}
+.nitem .th img{width:100%;height:100%;object-fit:cover}
+.nitem b{display:block;font-family:var(--font-display);font-weight:600;font-size:1.05rem}
+.nitem small{color:var(--parchment-2);font-size:.8rem}
+.ph-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.4rem}
+.ph-list li{display:grid;grid-template-columns:72px 1fr auto;gap:.6rem;align-items:center;padding:.35rem;border-radius:10px;background:rgba(0,0,0,.15)}
+.ph-list .th{width:72px;height:54px;border-radius:6px;overflow:hidden;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--parchment-2)}
+.ph-list .th img{width:100%;height:100%;object-fit:cover}
+.ph-list .path{font-family:var(--font-label);font-size:.62rem;color:var(--parchment-2);display:block;margin-top:.2rem;word-break:break-all}
+.ph-list .btns{display:flex;gap:.25rem}
+.chips{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.5rem}
+.chips span{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .3rem .2rem .6rem;border-radius:999px;background:rgba(255,243,214,.1);font-size:.85rem}
+.chips button{background:transparent;border:0;color:var(--danger);cursor:pointer;font-size:1rem;line-height:1}
+textarea{resize:vertical;min-height:120px}
 .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--ink);padding:.6rem 1.1rem;border-radius:10px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.4);z-index:100;transition:opacity .3s}
 .muted{color:var(--parchment-2);opacity:.8}
 
 @media (max-width:700px){
-  .row.c2,.row.c3{grid-template-columns:1fr}
+  .row.c2,.row.c3,.row.c4{grid-template-columns:1fr}
   .addrel{grid-template-columns:1fr}
   .photo-row{flex-direction:column;align-items:flex-start}
   .tabs button{padding:.45rem .7rem;font-size:.88rem}
@@ -150,6 +168,7 @@ legend{font-family:var(--font-label);font-size:.64rem;letter-spacing:.14em;text-
   <button data-tab="familles">Familles</button>
   <button data-tab="grandes">Grandes Familles</button>
   <button data-tab="relations">Relations</button>
+  <button data-tab="nouvelles">Nouvelles &amp; photos</button>
   <button data-tab="reglages">Réglages &amp; données</button>
 </nav>
 <main><section class="panel" id="panel"></section></main>
@@ -266,9 +285,19 @@ var Genea = (function(){
   }
 
   function birthText(p){
-    if(!p || !p.anneeNaissance) return "";
-    var m = p.moisNaissance ? MOIS[p.moisNaissance - 1] + " " : "";
-    return m + p.anneeNaissance;
+    if(!p || (!p.anneeNaissance && !p.moisNaissance)) return "";
+    var parts = [];
+    if(p.moisNaissance && p.jourNaissance) parts.push(p.jourNaissance === 1 ? "1er" : String(p.jourNaissance));
+    if(p.moisNaissance) parts.push(MOIS[p.moisNaissance - 1]);
+    if(p.anneeNaissance) parts.push(String(p.anneeNaissance));
+    return parts.join(" ");
+  }
+  // "2026-09-12" → "12 septembre 2026"
+  function dateText(iso){
+    var m = /^(\d{4})-(\d{2})(?:-(\d{2}))?$/.exec(iso || "");
+    if(!m) return iso || "";
+    var d = m[3] ? +m[3] : 0;
+    return (d ? (d === 1 ? "1er " : d + " ") : "") + MOIS[+m[2] - 1] + " " + m[1];
   }
 
   /* ------------------------------------------------------
@@ -608,13 +637,13 @@ var Genea = (function(){
   function emptyData(){
     return {
       site: { titre: "Plusieurs Branches, une Même Racine", sousTitre: "" },
-      grandesFamilles: [], familles: [], personnes: [], relations: []
+      grandesFamilles: [], familles: [], personnes: [], relations: [], nouvelles: []
     };
   }
 
   return {
     REL_TYPES: REL_TYPES, CATEGORIES: CATEGORIES, MOIS: MOIS,
-    build: build, slug: slug, fullName: fullName, birthText: birthText,
+    build: build, slug: slug, fullName: fullName, birthText: birthText, dateText: dateText,
     bloodLabel: bloodLabel, emptyData: emptyData
   };
 })();
@@ -697,7 +726,7 @@ var UI = (function(){
     return {
       site: Object.assign(e.site, d.site || {}),
       grandesFamilles: d.grandesFamilles || [], familles: d.familles || [],
-      personnes: d.personnes || [], relations: d.relations || []
+      personnes: d.personnes || [], relations: d.relations || [], nouvelles: d.nouvelles || []
     };
   }
   function snapshot(){ return JSON.stringify(DATA); }
@@ -801,7 +830,7 @@ var UI = (function(){
   });
   function render(){
     var p = document.getElementById("panel");
-    ({ personnes: renderPersons, familles: renderFamilies, grandes: renderGF, relations: renderRelations, reglages: renderSettings })[tab](p);
+    ({ personnes: renderPersons, familles: renderFamilies, grandes: renderGF, relations: renderRelations, nouvelles: renderNews, reglages: renderSettings })[tab](p);
   }
 
   /* ========== PERSONNES ========== */
@@ -867,10 +896,11 @@ var UI = (function(){
       '<fieldset><legend>Identité</legend><div class="row c2">' +
         '<label class="f"><span>Prénom(s) *</span><input type="text" name="prenom" required value="' + esc(p.prenom) + '"></label>' +
         '<label class="f"><span>Nom</span><input type="text" name="nom" value="' + esc(p.nom) + '"></label></div>' +
-        '<div class="row c3" style="margin-top:.8rem"><div class="f"><span class="eyebrow" style="font-size:.64rem">Sexe</span><div class="radios">' +
+        '<div class="row c4" style="margin-top:.8rem"><div class="f"><span class="eyebrow" style="font-size:.64rem">Sexe</span><div class="radios">' +
           '<label><input type="radio" name="sexe" value="M"' + (p.sexe === "M" ? " checked" : "") + '> Homme</label>' +
           '<label><input type="radio" name="sexe" value="F"' + (p.sexe === "F" ? " checked" : "") + '> Femme</label>' +
           '<label><input type="radio" name="sexe" value=""' + (!p.sexe ? " checked" : "") + '> ?</label></div></div>' +
+        '<label class="f"><span>Jour (facultatif)</span><input type="number" name="jour" min="1" max="31" value="' + esc(p.jourNaissance || "") + '"></label>' +
         '<label class="f"><span>Mois de naissance</span><select name="mois">' + mois + '</select></label>' +
         '<label class="f"><span>Année de naissance</span><input type="number" name="annee" min="1800" max="2100" value="' + esc(p.anneeNaissance || "") + '"></label></div>' +
       '</fieldset>' +
@@ -954,6 +984,7 @@ var UI = (function(){
         sexe: (form.querySelector("[name=sexe]:checked") || {}).value || "",
         moisNaissance: form.mois.value ? +form.mois.value : null,
         anneeNaissance: form.annee.value ? +form.annee.value : null,
+        jourNaissance: form.jour.value && form.mois.value ? Math.min(31, Math.max(1, +form.jour.value)) : null,
         photo: form.photo.value.trim(),
         familleId: form.familleId.value || null,
         grandeFamilleId: form.gf.value || null
@@ -1237,6 +1268,118 @@ var UI = (function(){
     return out.slice(0, 40).map(function(s){ return '<li>' + esc(s) + '</li>'; }).join("") + more;
   }
 
+  /* ========== NOUVELLES & PHOTOS ========== */
+  var NEWS_DIR = "photos/evenements/";
+  function thumb(src){
+    var u = photoPreviews[src] || src;
+    return u ? '<img src="' + esc(u) + '" alt="" onerror="this.replaceWith(document.createTextNode(\'photo ?\'))">' : '✦';
+  }
+  function renderNews(el){
+    var list = DATA.nouvelles.slice().sort(function(a, b){ return String(b.date || "").localeCompare(String(a.date || "")); });
+    el.innerHTML =
+      '<div class="panel-head"><h2>Nouvelles & photos (' + list.length + ')</h2><button class="btn" id="newN">+ Nouvelle publication</button></div>' +
+      '<p class="help">Racontez un évènement (mariage, naissance, réunion, fête…) et joignez-y des photos. ' +
+      'Les photos choisies doivent être copiées dans le dossier <b>' + NEWS_DIR + '</b> du site, avec le même nom de fichier.</p>' +
+      '<div class="nlist">' + (list.length ? list.map(function(n){
+        var first = (n.photos || [])[0];
+        return '<button class="nitem" data-n="' + esc(n.id) + '"><span class="th">' + thumb(first && first.src) + '</span>' +
+          '<span><b>' + esc(n.titre) + '</b><small>' + esc(Genea.dateText(n.date) || "Sans date") + ' · ' + (n.photos || []).length + ' photo(s) · ' +
+          (n.personnes || []).length + ' personne(s)</small></span></button>';
+      }).join("") : '<p class="muted">Aucune publication pour le moment.</p>') + '</div>';
+    el.querySelector("#newN").onclick = function(){ openNews(null); };
+    el.querySelector(".nlist").onclick = function(e){ var b = e.target.closest("[data-n]"); if(b) openNews(b.getAttribute("data-n")); };
+  }
+
+  function openNews(id){
+    var dlg = document.getElementById("dlg");
+    var src = id ? DATA.nouvelles.filter(function(n){ return n.id === id; })[0] : null;
+    var today = new Date(); var iso = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
+    var n = src ? JSON.parse(JSON.stringify(src)) : { titre: "", date: iso, texte: "", photos: [], personnes: [], grandeFamilleId: ui.gf || null };
+    n.photos = (n.photos || []).map(function(ph){ return typeof ph === "string" ? { src: ph, legende: "" } : ph; });
+    n.personnes = n.personnes || [];
+
+    dlg.innerHTML =
+      '<form method="dialog" id="nf"><div class="dlg-head"><h2>' + (id ? "Modifier la publication" : "Nouvelle publication") + '</h2><button type="button" class="x" data-close aria-label="Fermer">×</button></div>' +
+      '<div class="dlg-body">' +
+        '<label class="f"><span>Titre *</span><input type="text" name="titre" required value="' + esc(n.titre) + '" placeholder="Mariage de …, Réunion de famille 2026…"></label>' +
+        '<div class="row c2"><label class="f"><span>Date de l\'évènement</span><input type="date" name="date" value="' + esc(n.date || "") + '"></label>' +
+        '<label class="f"><span>Grande Famille (facultatif)</span><select name="gf">' + gfOptions(n.grandeFamilleId, "— toutes —") + '</select></label></div>' +
+        '<label class="f"><span>Texte</span><textarea name="texte" rows="6" placeholder="Racontez l\'évènement…">' + esc(n.texte || "") + '</textarea></label>' +
+        '<fieldset><legend>Photos</legend><ul class="ph-list" id="phList"></ul>' +
+          '<p style="display:flex;gap:.5rem;flex-wrap:wrap;margin:.7rem 0 0"><label class="btn small">+ Ajouter des photos<input type="file" id="phFiles" accept="image/*" multiple hidden></label></p>' +
+          '<p class="hint" style="margin-top:.5rem">Copiez ensuite ces fichiers dans le dossier <b>' + NEWS_DIR + '</b> du site.</p></fieldset>' +
+        '<fieldset><legend>Personnes concernées</legend><div class="chips" id="chips"></div>' +
+          '<div class="sel-add"><select id="pAddSel">' + personOptions("", null, "— ajouter une personne —") + '</select><button type="button" class="btn small" id="pAddBtn">Ajouter</button></div>' +
+          '<p class="hint" style="margin-top:.4rem">La publication apparaîtra aussi sur la fiche de ces personnes.</p></fieldset>' +
+      '</div><div class="dlg-foot"><div>' + (id ? '<button type="button" class="btn danger small" id="nDel">Supprimer</button>' : '') + '</div>' +
+      '<div class="r"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn" value="ok" id="nSave">Enregistrer</button></div></div></form>';
+
+    var form = dlg.querySelector("#nf");
+    function syncCaptions(){
+      dlg.querySelectorAll("[data-cap]").forEach(function(inp){ n.photos[+inp.getAttribute("data-cap")].legende = inp.value; });
+    }
+    function drawPhotos(){
+      dlg.querySelector("#phList").innerHTML = n.photos.length ? n.photos.map(function(ph, i){
+        return '<li><span class="th">' + thumb(ph.src) + '</span><span><input type="text" data-cap="' + i + '" placeholder="Légende (facultatif)" value="' + esc(ph.legende || "") + '">' +
+          '<span class="path">' + esc(ph.src) + '</span></span><span class="btns">' +
+          '<button type="button" class="btn ghost small" data-up="' + i + '" title="Monter">↑</button>' +
+          '<button type="button" class="btn danger small" data-rm="' + i + '" title="Retirer">×</button></span></li>';
+      }).join("") : '<li class="muted" style="display:block">Aucune photo.</li>';
+    }
+    function drawChips(){
+      dlg.querySelector("#chips").innerHTML = n.personnes.filter(function(pid){ return M.P[pid]; }).map(function(pid){
+        return '<span>' + esc(name(M.P[pid])) + '<button type="button" data-chip="' + esc(pid) + '" aria-label="Retirer">×</button></span>';
+      }).join("") || '<span class="muted" style="background:none;padding:0">Aucune.</span>';
+    }
+    drawPhotos(); drawChips();
+    dlg.querySelector("#phList").onclick = function(e){
+      syncCaptions();
+      var rm = e.target.closest("[data-rm]"), up = e.target.closest("[data-up]");
+      if(rm){ n.photos.splice(+rm.getAttribute("data-rm"), 1); drawPhotos(); }
+      if(up){ var i = +up.getAttribute("data-up"); if(i > 0){ var t = n.photos[i - 1]; n.photos[i - 1] = n.photos[i]; n.photos[i] = t; drawPhotos(); } }
+    };
+    dlg.querySelector("#phFiles").onchange = function(){
+      syncCaptions();
+      Array.prototype.forEach.call(this.files, function(f){
+        var path = NEWS_DIR + f.name;
+        photoPreviews[path] = URL.createObjectURL(f);
+        if(!n.photos.some(function(ph){ return ph.src === path; })) n.photos.push({ src: path, legende: "" });
+      });
+      this.value = ""; drawPhotos();
+    };
+    dlg.querySelector("#pAddBtn").onclick = function(){
+      var v = dlg.querySelector("#pAddSel").value;
+      if(v && n.personnes.indexOf(v) < 0){ n.personnes.push(v); drawChips(); }
+    };
+    dlg.querySelector("#chips").onclick = function(e){
+      var b = e.target.closest("[data-chip]"); if(!b) return;
+      n.personnes = n.personnes.filter(function(x){ return x !== b.getAttribute("data-chip"); }); drawChips();
+    };
+    var del = dlg.querySelector("#nDel");
+    if(del) del.onclick = function(){
+      if(!confirm("Supprimer cette publication ? (les fichiers photo ne sont pas effacés)")) return;
+      DATA.nouvelles = DATA.nouvelles.filter(function(x){ return x.id !== id; });
+      dlg.onclose = null; dlg.close(); commit(); render(); toast("Publication supprimée");
+    };
+    dlg.querySelector("#nSave").onclick = function(e){
+      if(!form.titre.value.trim()){ e.preventDefault(); form.titre.focus(); toast("Le titre est obligatoire"); }
+    };
+    dlg.onclose = function(){
+      if(dlg.returnValue !== "ok") return;
+      syncCaptions();
+      var v = {
+        titre: form.titre.value.trim(), date: form.date.value || "", texte: form.texte.value.trim(),
+        grandeFamilleId: form.gf.value || null,
+        photos: n.photos.map(function(ph){ return ph.legende ? { src: ph.src, legende: ph.legende } : { src: ph.src }; }),
+        personnes: n.personnes.slice()
+      };
+      if(id) Object.assign(src, v);
+      else DATA.nouvelles.push(Object.assign({ id: uid((v.date ? v.date + " " : "") + v.titre, function(x){ return DATA.nouvelles.some(function(q){ return q.id === x; }); }) }, v));
+      commit(); render(); toast("Publication enregistrée");
+    };
+    dlg.returnValue = ""; dlg.showModal();
+  }
+
   /* ========== RÉGLAGES & DONNÉES ========== */
   function renderSettings(el){
     el.innerHTML =
@@ -1247,13 +1390,13 @@ var UI = (function(){
       '<div class="panel-head" style="margin-top:2rem"><h2>Publier les modifications</h2></div>' +
       '<ol class="help" style="line-height:1.7"><li>Cliquez sur <b>⬇ Exporter les données</b> (en haut à droite).</li>' +
       '<li>Remplacez les fichiers <b>family-data.json</b> et <b>family-data.js</b> du site par ceux téléchargés (si le navigateur le demande, autorisez les téléchargements multiples).</li>' +
-      '<li>Copiez les nouvelles photos dans le dossier <b>photos/</b>.</li>' +
+      '<li>Copiez les nouvelles photos dans le dossier <b>photos/</b> (portraits) et <b>photos/evenements/</b> (photos d\'évènements).</li>' +
       '<li>Publiez le dossier (ou rechargez la page si le site tourne en local).</li></ol>' +
       '<p class="help">Vos modifications sont aussi conservées automatiquement dans ce navigateur (brouillon) tant qu\'elles ne sont pas exportées.</p>' +
       '<p style="display:flex;gap:.5rem;flex-wrap:wrap"><button class="btn ghost small" id="reload">Abandonner le brouillon et recharger family-data.json</button>' +
       '<button class="btn danger small" id="blank">Repartir d\'un fichier vide</button></p>' +
       '<p class="help" style="margin-top:1.5rem">' + DATA.grandesFamilles.length + ' Grande(s) Famille(s) · ' + DATA.familles.length + ' familles · ' +
-      DATA.personnes.length + ' personnes · ' + DATA.relations.length + ' relations déclarées.</p>';
+      DATA.personnes.length + ' personnes · ' + DATA.relations.length + ' relations déclarées · ' + DATA.nouvelles.length + ' nouvelle(s).</p>';
     el.querySelector("#sSave").onclick = function(){
       DATA.site.titre = el.querySelector("#st").value.trim() || "Plusieurs Branches, une Même Racine";
       DATA.site.sousTitre = el.querySelector("#ss").value.trim();

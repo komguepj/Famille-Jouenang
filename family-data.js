@@ -721,5 +721,6 @@ window.FAMILY_DATA = {
       "grandeFamilleId": "jouenang"
     }
   ],
-  "relations": []
+  "relations": [],
+  "nouvelles": []
 };

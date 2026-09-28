@@ -180,6 +180,64 @@ a.parent:hover{background:rgba(255,243,214,.07)}
 li.collapsed>ul{display:none}
 .union-label{font-family:var(--font-label);font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-light);display:block;margin-bottom:.1rem}
 
+/* ---------- Navigation ---------- */
+.site-header nav a.on{border-color:var(--gold-light);color:var(--gold-light)}
+
+/* ---------- Accueil : anniversaires & nouvelles ---------- */
+.teasers{max-width:1240px;margin:0 auto 1.6rem;padding:0 1.25rem;display:grid;grid-template-columns:1fr 1.4fr;gap:1rem}
+.teaser{background:var(--bg-card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem}
+.teaser h2{margin:0 0 .7rem;font-family:var(--font-display);font-weight:600;font-size:1.1rem;display:flex;justify-content:space-between;align-items:baseline;gap:.5rem}
+.teaser h2 a{font-family:var(--font-label);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-light);font-weight:400;white-space:nowrap}
+.teaser .muted{color:var(--parchment-2);opacity:.8;font-size:.9rem;margin:0}
+.bday-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.2rem}
+.bday-list a{display:flex;align-items:center;gap:.6rem;padding:.3rem .35rem;border-radius:8px}
+.bday-list a:hover{background:rgba(255,243,214,.07)}
+.bday-list .when{margin-left:auto;font-family:var(--font-label);font-size:.7rem;color:var(--gold-light);text-align:right;white-space:nowrap}
+.bday-list .when small{display:block;color:var(--parchment-2);opacity:.8}
+.news-mini{display:flex;flex-direction:column;gap:.6rem}
+.news-mini a{display:flex;gap:.8rem;align-items:center;padding:.3rem;border-radius:10px}
+.news-mini a:hover{background:rgba(255,243,214,.07)}
+.news-mini .thumb{width:84px;height:62px;flex:none;border-radius:8px;overflow:hidden;background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;color:var(--gold-light)}
+.news-mini .thumb img{width:100%;height:100%;object-fit:cover}
+.news-mini b{display:block;font-family:var(--font-display);font-weight:600}
+.news-mini small{color:var(--parchment-2);font-size:.78rem}
+
+/* ---------- Calendrier ---------- */
+.cal{max-width:1240px;margin:0 auto;padding:0 1.25rem 3rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1rem;align-items:start}
+.month{background:var(--bg-card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem}
+.month.now{border-color:var(--gold);box-shadow:0 0 0 3px rgba(244,185,66,.18)}
+.month h2{margin:0 0 .6rem;font-family:var(--font-display);font-weight:600;font-size:1.15rem;display:flex;justify-content:space-between;align-items:center}
+.month h2 span{font-family:var(--font-label);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);background:var(--gold);padding:.15rem .45rem;border-radius:5px;font-weight:400}
+.month .none{color:var(--parchment-2);opacity:.6;font-size:.85rem;margin:0}
+.cal-note{max-width:760px;margin:0 auto 2rem;padding:0 1.25rem;text-align:center;color:var(--parchment-2);font-size:.88rem}
+
+/* ---------- Nouvelles ---------- */
+.news{max-width:900px;margin:0 auto;padding:0 1.25rem 3rem;display:flex;flex-direction:column;gap:1.2rem}
+.post{background:var(--bg-card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.post-body{padding:1.1rem 1.3rem 1.2rem}
+.post h2{margin:.2rem 0 .5rem;font-family:var(--font-display);font-weight:600;font-size:1.35rem;line-height:1.2}
+.post h2 a:hover{color:var(--gold-light)}
+.post .date{font-family:var(--font-label);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sage-light)}
+.post .txt{color:var(--parchment);margin:0 0 .8rem;white-space:pre-line}
+.post .more{font-family:var(--font-label);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-light)}
+.tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem}
+.tags a{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .55rem .2rem .2rem;border-radius:999px;background:rgba(255,243,214,.07);font-size:.82rem}
+.tags a:hover{background:rgba(255,243,214,.15)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:4px;background:rgba(0,0,0,.2)}
+.gallery.cover{grid-template-columns:repeat(var(--n,1),1fr)}
+.gallery button{position:relative;padding:0;border:0;background:#0d3d22;cursor:zoom-in;aspect-ratio:4/3;overflow:hidden;display:block;width:100%}
+.gallery.cover.n1 button{aspect-ratio:16/8}
+.gallery img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.gallery button:hover img{transform:scale(1.04)}
+.gallery .plusn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(5,25,14,.6);font-family:var(--font-display);font-size:1.6rem;color:var(--ivory)}
+.gallery .cap{position:absolute;left:0;right:0;bottom:0;padding:.35rem .5rem;font-size:.75rem;text-align:left;background:linear-gradient(transparent,rgba(0,0,0,.7));color:var(--ivory)}
+.imgmiss{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:.5rem;font-family:var(--font-label);font-size:.62rem;color:var(--parchment-2);text-align:center;word-break:break-all}
+.lightbox{position:fixed;inset:0;z-index:100;background:rgba(3,15,8,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem}
+.lightbox img{max-width:100%;max-height:calc(100vh - 120px);object-fit:contain;border-radius:6px}
+.lightbox p{color:var(--parchment);margin:.8rem 0 0;text-align:center}
+.lightbox button{position:absolute;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:50%;width:46px;height:46px;font-size:1.3rem;cursor:pointer}
+.lightbox .lb-x{top:14px;right:14px}.lightbox .lb-p{left:14px;top:50%}.lightbox .lb-n{right:14px;top:50%}
+
 .site-footer{text-align:center;padding:2rem 1.25rem 3rem;font-family:var(--font-label);font-size:.68rem;letter-spacing:.08em;color:rgba(255,243,214,.45)}
 .site-footer a{border-bottom:1px dotted}
 
@@ -193,6 +251,8 @@ li.collapsed>ul{display:none}
   .site-header .brand{font-size:.9rem}
   .toolbar{flex-direction:column;align-items:stretch}
   .search{flex:1 1 auto}
+  .teasers{grid-template-columns:1fr}
+  .site-header{flex-wrap:wrap}
 }
 </style>
 </head>
@@ -308,9 +368,19 @@ var Genea = (function(){
   }
 
   function birthText(p){
-    if(!p || !p.anneeNaissance) return "";
-    var m = p.moisNaissance ? MOIS[p.moisNaissance - 1] + " " : "";
-    return m + p.anneeNaissance;
+    if(!p || (!p.anneeNaissance && !p.moisNaissance)) return "";
+    var parts = [];
+    if(p.moisNaissance && p.jourNaissance) parts.push(p.jourNaissance === 1 ? "1er" : String(p.jourNaissance));
+    if(p.moisNaissance) parts.push(MOIS[p.moisNaissance - 1]);
+    if(p.anneeNaissance) parts.push(String(p.anneeNaissance));
+    return parts.join(" ");
+  }
+  // "2026-09-12" → "12 septembre 2026"
+  function dateText(iso){
+    var m = /^(\d{4})-(\d{2})(?:-(\d{2}))?$/.exec(iso || "");
+    if(!m) return iso || "";
+    var d = m[3] ? +m[3] : 0;
+    return (d ? (d === 1 ? "1er " : d + " ") : "") + MOIS[+m[2] - 1] + " " + m[1];
   }
 
   /* ------------------------------------------------------
@@ -650,13 +720,13 @@ var Genea = (function(){
   function emptyData(){
     return {
       site: { titre: "Plusieurs Branches, une Même Racine", sousTitre: "" },
-      grandesFamilles: [], familles: [], personnes: [], relations: []
+      grandesFamilles: [], familles: [], personnes: [], relations: [], nouvelles: []
     };
   }
 
   return {
     REL_TYPES: REL_TYPES, CATEGORIES: CATEGORIES, MOIS: MOIS,
-    build: build, slug: slug, fullName: fullName, birthText: birthText,
+    build: build, slug: slug, fullName: fullName, birthText: birthText, dateText: dateText,
     bloodLabel: bloodLabel, emptyData: emptyData
   };
 })();
@@ -761,9 +831,11 @@ var UI = (function(){
   /* ---------- Gabarits communs ---------- */
   function site(){ return DATA.site || {}; }
   function header(){
+    var h = (location.hash || "#/").split("/")[1] || "";
+    function nav(href, label, key){ return '<a class="btn ghost small' + (h === key ? ' on' : '') + '" href="' + href + '">' + label + '</a>'; }
     return (PREVIEW ? '<div class="preview-bar">Aperçu du brouillon de l\'administration — non publié</div>' : "") +
       '<header class="site-header"><a class="brand" href="#/">' + esc(site().titre || "Plusieurs Branches, une Même Racine") + '</a>' +
-      '<nav><a class="btn ghost small" href="#/">Familles</a></nav></header>';
+      '<nav>' + nav("#/", "Familles", "") + nav("#/anniversaires", "Anniversaires", "anniversaires") + nav("#/nouvelles", "Nouvelles & photos", "nouvelles") + '</nav></header>';
   }
   function footer(){
     return '<footer class="site-footer">' + esc(site().titre || "") + ' · ' + M.data.personnes.length + ' personnes · ' +
@@ -869,6 +941,7 @@ var UI = (function(){
         return '<a class="gf-card" href="#/grande-famille/' + encodeURIComponent(g.id) + '"><span><small>Grande Famille</small><strong>' + esc(g.nom) + '</strong>' +
           '<small>' + n + ' famille' + (n > 1 ? 's' : '') + '</small></span><span class="go">Arbre →</span></a>';
       }).join("") + '</div>' : '') +
+      teasersHtml() +
       '<div class="toolbar"><div class="filters" id="filters"></div>' +
       '<input class="search" id="q" type="search" placeholder="Rechercher un nom…" value="' + esc(query) + '"></div>' +
       '<div class="grid" id="grid"></div>' + footer();
@@ -991,7 +1064,7 @@ var UI = (function(){
       (foyers.length ? '<dt>Foyer' + (foyers.length > 1 ? 's' : '') + '</dt><dd>' + foyers.map(function(f){
         return '<a href="#/famille/' + encodeURIComponent(f.id) + '">' + esc(f.nom) + '</a>'; }).join("<br>") + '</dd>' : '') +
       '<dt>Grande Famille</dt><dd>' + (gfId && M.GF[gfId] ? '<a href="#/grande-famille/' + encodeURIComponent(gfId) + '/' + encodeURIComponent(id) + '">' + esc(gfName(gfId)) + ' — voir l\'arbre</a>' : '—') + '</dd>' +
-      '</dl></aside><div class="rels">' +
+      '</dl></aside><div class="rels">' + personNewsHtml(id) +
       (relHtml ? relHtml + '<p class="legend">Les relations marquées <span class="badge-deduit">déduit</span> sont calculées automatiquement à partir des familles et des liens déclarés.</p>'
                : '<div class="empty">Aucune relation enregistrée pour le moment.</div>') +
       '</div></div>' + footer();
@@ -1072,6 +1145,147 @@ var UI = (function(){
     });
   }
 
+  /* ---------- Anniversaires ---------- */
+  function ageThisYear(p, year){ return p.anneeNaissance ? year - p.anneeNaissance : null; }
+  function bdayItem(p, year){
+    var age = ageThisYear(p, year);
+    var day = p.jourNaissance ? (p.jourNaissance === 1 ? "1er" : p.jourNaissance) + " " + Genea.MOIS[p.moisNaissance - 1] : Genea.MOIS[p.moisNaissance - 1];
+    return '<li><a href="#/personne/' + encodeURIComponent(p.id) + '">' + avatar(p, 34) + '<span>' + esc(name(p)) + '</span>' +
+      '<span class="when">' + esc(day) + (age != null && age >= 0 ? '<small>' + (age === 0 ? "naissance" : age + " an" + (age > 1 ? "s" : "")) + '</small>' : '') + '</span></a></li>';
+  }
+  function peopleOfMonth(m){
+    return M.data.personnes.filter(function(p){ return p.moisNaissance === m; })
+      .sort(function(a, b){ return (a.jourNaissance || 99) - (b.jourNaissance || 99) || name(a).localeCompare(name(b)); });
+  }
+  function renderBirthdays(){
+    document.title = "Calendrier des anniversaires — " + (site().titre || "");
+    var now = new Date(), cur = now.getMonth() + 1, year = now.getFullYear();
+    var months = [];
+    for(var i = 0; i < 12; i++) months.push(((cur - 1 + i) % 12) + 1);
+    var known = M.data.personnes.filter(function(p){ return p.moisNaissance; }).length;
+    var missing = M.data.personnes.length - known;
+    app.innerHTML = header() +
+      '<header class="page-head"><p class="eyebrow">À ne pas oublier</p><h1>Calendrier des anniversaires</h1>' +
+      '<p>À partir du mois en cours. L\'âge indiqué est celui atteint cette année.</p></header>' +
+      '<div class="cal">' + months.map(function(m){
+        var y = m < cur ? year + 1 : year;
+        var list = peopleOfMonth(m);
+        return '<section class="month' + (m === cur ? ' now' : '') + '"><h2>' + Genea.MOIS[m - 1].replace(/^./, function(c){ return c.toUpperCase(); }) +
+          (m === cur ? ' <span>Ce mois-ci</span>' : '') + '</h2>' +
+          (list.length ? '<ul class="bday-list">' + list.map(function(p){ return bdayItem(p, y); }).join("") + '</ul>' : '<p class="none">Aucun anniversaire enregistré.</p>') + '</section>';
+      }).join("") + '</div>' +
+      (missing ? '<p class="cal-note">' + missing + ' personne' + (missing > 1 ? 's n\'ont' : ' n\'a') + ' pas encore de mois de naissance : ' +
+        'complétez leur fiche dans <b>admin.html</b> pour les voir apparaître ici.</p>' : '') + footer();
+  }
+
+  /* ---------- Nouvelles & photos ---------- */
+  function newsList(){
+    return (M.data.nouvelles || []).slice().sort(function(a, b){ return String(b.date || "").localeCompare(String(a.date || "")); });
+  }
+  function photoSrc(ph){ return typeof ph === "string" ? ph : (ph && ph.src) || ""; }
+  function photoCap(ph){ return typeof ph === "string" ? "" : (ph && ph.legende) || ""; }
+  function imgTag(src){
+    return '<img src="' + esc(src) + '" alt="" loading="lazy" onerror="this.outerHTML=\'<span class=&quot;imgmiss&quot;>' + esc(src).replace(/&#39;/g, "") + '</span>\'">';
+  }
+  function galleryHtml(post, max){
+    var photos = post.photos || [];
+    if(!photos.length) return "";
+    var shown = max ? photos.slice(0, max) : photos;
+    var cls = max ? ' cover n' + shown.length : '';
+    return '<div class="gallery' + cls + '" style="--n:' + shown.length + '">' + shown.map(function(ph, i){
+      var extra = max && i === shown.length - 1 && photos.length > shown.length ? '<span class="plusn">+' + (photos.length - shown.length) + '</span>' : '';
+      return '<button type="button" data-lb="' + esc(post.id) + '" data-i="' + i + '" aria-label="Agrandir la photo">' + imgTag(photoSrc(ph)) +
+        (!max && photoCap(ph) ? '<span class="cap">' + esc(photoCap(ph)) + '</span>' : '') + extra + '</button>';
+    }).join("") + '</div>';
+  }
+  function tagsHtml(post){
+    var ids = (post.personnes || []).filter(function(id){ return M.P[id]; });
+    if(!ids.length) return "";
+    return '<div class="tags">' + ids.map(function(id){
+      return '<a href="#/personne/' + encodeURIComponent(id) + '">' + avatar(M.P[id], 24) + esc(name(M.P[id])) + '</a>';
+    }).join("") + '</div>';
+  }
+  function excerpt(t, n){ t = String(t || ""); return t.length > n ? t.slice(0, n).replace(/\s+\S*$/, "") + "…" : t; }
+  function postMeta(post){
+    return '<span class="date">' + esc(Genea.dateText(post.date)) +
+      (post.grandeFamilleId && M.GF[post.grandeFamilleId] ? ' · Grande Famille ' + esc(M.GF[post.grandeFamilleId].nom) : '') + '</span>';
+  }
+  function renderNews(){
+    document.title = "Nouvelles & photos — " + (site().titre || "");
+    var list = newsList();
+    app.innerHTML = header() +
+      '<header class="page-head"><p class="eyebrow">La vie de la famille</p><h1>Nouvelles et photos de famille</h1>' +
+      '<p>Mariages, naissances, réunions, fêtes… les moments partagés.</p></header>' +
+      '<div class="news">' + (list.length ? list.map(function(post){
+        return '<article class="post">' + galleryHtml(post, 4) + '<div class="post-body">' + postMeta(post) +
+          '<h2><a href="#/nouvelles/' + encodeURIComponent(post.id) + '">' + esc(post.titre) + '</a></h2>' +
+          (post.texte ? '<p class="txt">' + esc(excerpt(post.texte, 320)) + '</p>' : '') +
+          '<a class="more" href="#/nouvelles/' + encodeURIComponent(post.id) + '">Lire et voir les ' + (post.photos || []).length + ' photo(s) →</a>' +
+          tagsHtml(post) + '</div></article>';
+      }).join("") : '<div class="empty">Aucune nouvelle pour le moment. Ajoutez la première depuis <strong>admin.html</strong> (onglet « Nouvelles &amp; photos »).</div>') +
+      '</div>' + footer();
+  }
+  function renderPost(id){
+    var post = (M.data.nouvelles || []).filter(function(n){ return n.id === id; })[0];
+    if(!post) return notFound("Nouvelle");
+    document.title = post.titre + " — " + (site().titre || "");
+    app.innerHTML = header() +
+      '<header class="page-head"><p class="eyebrow">' + esc(Genea.dateText(post.date) || "Nouvelle") + '</p><h1>' + esc(post.titre) + '</h1>' +
+      '<div class="actions"><a class="btn ghost small" href="#/nouvelles">← Toutes les nouvelles</a></div></header>' +
+      '<div class="news"><article class="post"><div class="post-body">' + postMeta(post) +
+      (post.texte ? '<p class="txt" style="margin-top:.6rem">' + esc(post.texte) + '</p>' : '') + tagsHtml(post) + '</div>' +
+      galleryHtml(post, 0) + '</article></div>' + footer();
+  }
+  function personNewsHtml(pid){
+    var list = newsList().filter(function(n){ return (n.personnes || []).indexOf(pid) >= 0; });
+    if(!list.length) return "";
+    return '<section class="relgroup"><h2>Nouvelles & photos (' + list.length + ')</h2><div class="news-mini">' + list.map(miniPost).join("") + '</div></section>';
+  }
+  function miniPost(post){
+    var first = (post.photos || [])[0];
+    return '<a href="#/nouvelles/' + encodeURIComponent(post.id) + '"><span class="thumb">' + (first ? imgTag(photoSrc(first)) : '✦') + '</span>' +
+      '<span><b>' + esc(post.titre) + '</b><small>' + esc(Genea.dateText(post.date)) + ' · ' + (post.photos || []).length + ' photo(s)</small></span></a>';
+  }
+  function teasersHtml(){
+    var now = new Date(), cur = now.getMonth() + 1;
+    var bd = peopleOfMonth(cur);
+    var news = newsList().slice(0, 3);
+    return '<div class="teasers"><section class="teaser"><h2>Anniversaires de ' + Genea.MOIS[cur - 1] + ' <a href="#/anniversaires">Calendrier →</a></h2>' +
+      (bd.length ? '<ul class="bday-list">' + bd.slice(0, 6).map(function(p){ return bdayItem(p, now.getFullYear()); }).join("") + '</ul>' +
+        (bd.length > 6 ? '<p class="muted" style="margin-top:.4rem">… et ' + (bd.length - 6) + ' autre(s).</p>' : '')
+        : '<p class="muted">Aucun anniversaire enregistré ce mois-ci.</p>') + '</section>' +
+      '<section class="teaser"><h2>Dernières nouvelles <a href="#/nouvelles">Tout voir →</a></h2>' +
+      (news.length ? '<div class="news-mini">' + news.map(miniPost).join("") + '</div>' : '<p class="muted">Aucune nouvelle pour le moment.</p>') + '</section></div>';
+  }
+
+  /* ---------- Visionneuse de photos ---------- */
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("[data-lb]"); if(!b) return;
+    var post = (M.data.nouvelles || []).filter(function(n){ return n.id === b.getAttribute("data-lb"); })[0];
+    if(post) openLightbox(post.photos || [], +b.getAttribute("data-i"));
+  });
+  function openLightbox(photos, i){
+    var box = document.createElement("div");
+    box.className = "lightbox"; box.setAttribute("role", "dialog");
+    function show(){
+      var ph = photos[i];
+      box.innerHTML = '<img src="' + esc(photoSrc(ph)) + '" alt="">' + (photoCap(ph) ? '<p>' + esc(photoCap(ph)) + '</p>' : '') +
+        '<p style="font-size:.75rem;opacity:.6">' + (i + 1) + ' / ' + photos.length + '</p>' +
+        '<button class="lb-x" aria-label="Fermer">×</button>' +
+        (photos.length > 1 ? '<button class="lb-p" aria-label="Précédente">‹</button><button class="lb-n" aria-label="Suivante">›</button>' : '');
+    }
+    function close(){ box.remove(); document.removeEventListener("keydown", key); }
+    function move(d){ i = (i + d + photos.length) % photos.length; show(); }
+    function key(e){ if(e.key === "Escape") close(); if(e.key === "ArrowRight") move(1); if(e.key === "ArrowLeft") move(-1); }
+    box.addEventListener("click", function(e){
+      if(e.target.closest(".lb-p")) move(-1);
+      else if(e.target.closest(".lb-n")) move(1);
+      else if(e.target.closest(".lb-x") || e.target === box) close();
+    });
+    document.addEventListener("keydown", key);
+    show(); document.body.appendChild(box);
+  }
+
   function notFound(what){
     app.innerHTML = header() + '<div class="empty" style="margin-top:4rem">' + what + ' introuvable.<br><br><a class="btn ghost small" href="#/">← Retour aux familles</a></div>' + footer();
   }
@@ -1081,6 +1295,9 @@ var UI = (function(){
     if(parts[0] === "personne" && parts[1]) renderPerson(parts[1]);
     else if(parts[0] === "famille" && parts[1]) renderFamily(parts[1]);
     else if(parts[0] === "grande-famille" && parts[1]) renderTree(parts[1], parts[2]);
+    else if(parts[0] === "anniversaires") renderBirthdays();
+    else if(parts[0] === "nouvelles" && parts[1]) renderPost(parts[1]);
+    else if(parts[0] === "nouvelles") renderNews();
     else renderHome();
     if(!(parts[0] === "grande-famille" && parts[2])) window.scrollTo(0, 0);
   }

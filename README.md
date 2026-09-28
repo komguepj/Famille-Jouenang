@@ -7,6 +7,7 @@
 - **family-data.json**: toutes les données.
 - **family-data.js**: la même chose, lisible quand on ouvre le site par double-clic. admin.html produit les deux fichiers ensemble.
 - **photos/**: les photos des personnes (par exemple `photos/gilbert.jpg`)
+- **photos/evenements/**: les photos des évènements (onglet « Nouvelles & photos »)
 
 ## Ouvrir le site
 
@@ -28,6 +29,19 @@ Double-cliquez simplement sur **index.html** : le site lit alors `family-data.js
 Tant que vous n'avez pas exporté, vos modifications restent enregistrées dans le navigateur (brouillon).
 
 > admin.html ne peut rien modifier sur le serveur : il produit seulement un fichier à télécharger. Si vous ne voulez pas que la famille voie cette page, vous pouvez quand même ne pas la publier et la garder uniquement sur votre ordinateur.
+
+## Calendrier des anniversaires
+
+La page **Anniversaires** classe les personnes par mois de naissance, en commençant par le mois en cours, et indique l'âge atteint cette année. La page d'accueil rappelle aussi les anniversaires du mois. Seules les personnes qui ont un mois de naissance y apparaissent. Le jour de naissance est facultatif : ajoutez-le dans la fiche de la personne pour un classement plus précis.
+
+## Nouvelles et photos de famille
+
+Dans admin.html, onglet **Nouvelles & photos**, cliquez sur **+ Nouvelle publication** et remplissez :
+- le titre, la date et le texte ;
+- les photos (plusieurs à la fois, avec une légende facultative et un ordre modifiable) ;
+- les personnes concernées : la publication apparaîtra aussi sur leur fiche.
+
+Copiez ensuite les photos choisies dans `photos/evenements/`, avec le même nom de fichier. Sur le site, les photos s'ouvrent en grand quand on clique dessus, et les flèches permettent de passer de l'une à l'autre.
 
 ## Relations déduites automatiquement
 
@@ -51,9 +65,12 @@ Dans les fiches, les relations calculées portent la mention **déduit**.
   "grandesFamilles": [ { "id": "jouenang", "nom": "Jouenang", "description": "" } ],
   "familles": [ { "id": "...", "nom": "Famille Abel & Martine", "grandeFamilleId": "jouenang", "pereId": "abel", "mereId": "martine", "ordre": 1 } ],
   "personnes": [ { "id": "gilbert", "prenom": "Gilbert", "nom": "Kamnang", "sexe": "M",
-                   "moisNaissance": 3, "anneeNaissance": 1965, "photo": "photos/gilbert.jpg",
+                   "jourNaissance": 12, "moisNaissance": 3, "anneeNaissance": 1965, "photo": "photos/gilbert.jpg",
                    "familleId": "famille-abel-martine", "grandeFamilleId": "jouenang" } ],
-  "relations": [ { "a": "x", "type": "cousin", "b": "y" } ]
+  "relations": [ { "a": "x", "type": "cousin", "b": "y" } ],
+  "nouvelles": [ { "id": "...", "titre": "Réunion de famille", "date": "2026-08-15", "texte": "...",
+                   "photos": [ { "src": "photos/evenements/groupe.jpg", "legende": "Photo de groupe" } ],
+                   "personnes": ["jules"], "grandeFamilleId": null } ]
 }
 ```
 
