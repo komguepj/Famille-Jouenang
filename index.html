@@ -184,7 +184,17 @@ li.collapsed>ul{display:none}
 .site-header nav a.on{border-color:var(--gold-light);color:var(--gold-light)}
 
 /* ---------- Accueil : anniversaires & nouvelles ---------- */
-.teasers{max-width:1240px;margin:0 auto 1.6rem;padding:0 1.25rem;display:grid;grid-template-columns:1fr 1.4fr;gap:1rem}
+/* Mise en page accueil : familles au centre, anniversaires & nouvelles sur le côté (grand écran) ou en bas */
+.home-layout{max-width:1560px;margin:0 auto;padding:0 1.25rem 3rem;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:1.4rem;align-items:start}
+.home-main .toolbar,.home-main .grid{max-width:none;padding-left:0;padding-right:0}
+.home-main .grid{padding-bottom:0}
+.home-side{position:sticky;top:84px;max-height:calc(100vh - 100px);overflow:auto;scrollbar-width:thin}
+.teasers{display:flex;flex-direction:column;gap:1rem}
+@media (max-width:1100px){
+  .home-layout{grid-template-columns:1fr}
+  .home-side{position:static;max-height:none;overflow:visible;border-top:1px dashed rgba(244,185,66,.35);padding-top:1.4rem}
+  .teasers{display:grid;grid-template-columns:1fr 1.4fr}
+}
 .teaser{background:var(--bg-card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem}
 .teaser h2{margin:0 0 .7rem;font-family:var(--font-display);font-weight:600;font-size:1.1rem;display:flex;justify-content:space-between;align-items:baseline;gap:.5rem}
 .teaser h2 a{font-family:var(--font-label);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-light);font-weight:400;white-space:nowrap}
@@ -251,7 +261,7 @@ li.collapsed>ul{display:none}
   .site-header .brand{font-size:.9rem}
   .toolbar{flex-direction:column;align-items:stretch}
   .search{flex:1 1 auto}
-  .teasers{grid-template-columns:1fr}
+  .teasers{grid-template-columns:1fr !important}
   .site-header{flex-wrap:wrap}
 }
 </style>
@@ -941,10 +951,11 @@ var UI = (function(){
         return '<a class="gf-card" href="#/grande-famille/' + encodeURIComponent(g.id) + '"><span><small>Grande Famille</small><strong>' + esc(g.nom) + '</strong>' +
           '<small>' + n + ' famille' + (n > 1 ? 's' : '') + '</small></span><span class="go">Arbre →</span></a>';
       }).join("") + '</div>' : '') +
-      teasersHtml() +
+      '<div class="home-layout"><div class="home-main">' +
       '<div class="toolbar"><div class="filters" id="filters"></div>' +
       '<input class="search" id="q" type="search" placeholder="Rechercher un nom…" value="' + esc(query) + '"></div>' +
-      '<div class="grid" id="grid"></div>' + footer();
+      '<div class="grid" id="grid"></div></div>' +
+      '<aside class="home-side" aria-label="Anniversaires et nouvelles">' + teasersHtml() + '</aside></div>' + footer();
 
     var fl = document.getElementById("filters");
     fl.innerHTML = '<button class="chip' + (filterGF ? '' : ' on') + '" data-gf="">Toutes</button>' +
