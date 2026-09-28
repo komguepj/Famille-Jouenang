@@ -78,9 +78,16 @@ a.chip:hover{background:rgba(244,185,66,.2)}
 
 .grid{max-width:1240px;margin:0 auto;padding:0 1.25rem 3rem}
 .grid-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1.1rem;align-items:start}
-.grid-row.roots{grid-template-columns:repeat(2,minmax(0,420px));justify-content:center;margin-bottom:1.1rem;padding-bottom:1.3rem;border-bottom:1px dashed rgba(244,185,66,.35)}
-.grid-row.roots .fcard{border-color:rgba(244,185,66,.45)}
-@media (max-width:700px){.grid-row.roots{grid-template-columns:1fr}}
+.grid-row.roots{display:flex;flex-wrap:wrap;justify-content:center;gap:1.1rem;margin-bottom:1.1rem;padding-bottom:1.3rem;border-bottom:1px dashed rgba(244,185,66,.35)}
+.grid-row.roots .fcard{border-color:rgba(244,185,66,.45);width:min(100%,420px)}
+.grid-row.roots .fcard.merged{width:min(100%,900px)}
+.grid-row:not(.roots) .fcard.merged{grid-column:1/-1}
+.couple.multi{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:.3rem 1.2rem}
+.couple.multi .parent{width:150px}
+.family-page .couple.multi{max-width:none}
+.kids-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.4rem 1.4rem}
+.kids h4{margin:.2rem 0 .35rem;font-family:var(--font-label);font-weight:400;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--sage-light)}
+.sub-title{font-family:var(--font-label);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sage-light);margin:1.2rem 0 .6rem;text-align:center}
 .fcard{background:var(--bg-card);border:1px solid var(--line);border-radius:18px;padding:1.1rem 1.1rem 1rem;box-shadow:0 10px 30px rgba(9,41,23,.25);display:flex;flex-direction:column;gap:.9rem;aspect-ratio:auto}
 .fcard-head{display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem}
 .fcard-head h2{font-family:var(--font-display);font-weight:600;font-size:1.2rem;margin:0;line-height:1.2}
@@ -792,15 +799,55 @@ var UI = (function(){
       '<span class="name">' + esc(name(p)) + '</span>' + (Genea.birthText(p) ? '<span class="role">' + esc(Genea.birthText(p)) + '</span>' : '') + '</a></div>';
   }
 
+  // Familles d'un même père (plusieurs épouses) : affichées dans une seule boîte
+  function groupByFather(fams){
+    var groups = [], byPere = {};
+    fams.forEach(function(f){
+      if(f.pereId && M.P[f.pereId]){
+        if(byPere[f.pereId]){ byPere[f.pereId].push(f); return; }
+        byPere[f.pereId] = [f];
+        groups.push(byPere[f.pereId]);
+      }else groups.push([f]);
+    });
+    return groups;
+  }
+  function siblingsOfFamily(f){
+    if(!f.pereId || !M.P[f.pereId]) return [f];
+    return M.orderedFamilies().filter(function(x){ return x.pereId === f.pereId; });
+  }
+  function kidItem(k){
+    var p = M.P[k];
+    var hasFam = M.familiesHeadedBy(k).some(function(x){ return M.childrenOfFamily(x.id).length || (x.pereId && x.mereId); });
+    return '<li><a href="#/personne/' + encodeURIComponent(k) + '">' + avatar(p, 30) + '<span>' + esc(name(p)) +
+      (hasFam ? ' <span class="plus" title="A fondé sa propre famille">●</span>' : '') + '</span>' +
+      '<span class="yr">' + esc(yearOf(p)) + '</span></a></li>';
+  }
+  function groupCard(group){
+    if(group.length === 1) return familyCard(group[0]);
+    var f0 = group[0];
+    var names = group.map(function(f){ return f.nom; }).filter(function(n, i, a){ return a.indexOf(n) === i; });
+    var total = 0;
+    var cols = group.map(function(f){
+      var kids = M.childrenOfFamily(f.id); total += kids.length;
+      if(!kids.length) return "";
+      var mere = M.P[f.mereId];
+      return '<div><h4>Avec ' + esc(mere ? name(mere) : "mère non renseignée") + ' (' + kids.length + ')</h4><ul>' + kids.map(kidItem).join("") + '</ul></div>';
+    }).join("");
+    return '<article class="fcard merged" id="f-' + esc(f0.id) + '">' +
+      '<div class="fcard-head"><h2><a href="#/famille/' + encodeURIComponent(f0.id) + '">' + esc(names.join(" / ")) + '</a></h2>' +
+      (f0.grandeFamilleId && M.GF[f0.grandeFamilleId] ? '<a class="chip" href="#/grande-famille/' + encodeURIComponent(f0.grandeFamilleId) + '" title="Voir l\'arbre">' + esc(gfName(f0.grandeFamilleId)) + '</a>' : '') +
+      '</div>' + multiCoupleHtml(group) +
+      (total ? '<div class="kids"><h3>Enfants (' + total + ')</h3><div class="kids-cols">' + cols + '</div></div>' : '') + '</article>';
+  }
+  function multiCoupleHtml(group){
+    var html = parentBlock(group[0].pereId, "Père") + '<span class="heart" style="margin-top:30px">♥</span>';
+    html += group.map(function(f){ return M.P[f.mereId] ? parentBlock(f.mereId, "Mère") : ""; }).join("");
+    return '<div class="couple multi">' + html + '</div>';
+  }
+
   function familyCard(f){
     var kids = M.childrenOfFamily(f.id);
-    var list = kids.length ? '<ul>' + kids.map(function(k){
-      var p = M.P[k];
-      var hasFam = M.familiesHeadedBy(k).length;
-      return '<li><a href="#/personne/' + encodeURIComponent(k) + '">' + avatar(p, 30) + '<span>' + esc(name(p)) +
-        (hasFam ? ' <span class="plus" title="A fondé sa propre famille">●</span>' : '') + '</span>' +
-        '<span class="yr">' + esc(yearOf(p)) + '</span></a></li>';
-    }).join("") + '</ul>' : '';
+    var list = kids.length ? '<ul>' + kids.map(kidItem).join("") + '</ul>' : '';
     return '<article class="fcard" id="f-' + esc(f.id) + '">' +
       '<div class="fcard-head"><h2><a href="#/famille/' + encodeURIComponent(f.id) + '">' + esc(f.nom) + '</a></h2>' +
       (f.grandeFamilleId && M.GF[f.grandeFamilleId] ? '<a class="chip" href="#/grande-famille/' + encodeURIComponent(f.grandeFamilleId) + '" title="Voir l\'arbre">' + esc(gfName(f.grandeFamilleId)) + '</a>' : '') +
@@ -850,8 +897,8 @@ var UI = (function(){
     // 1re rangée : uniquement les familles fondatrices
     var roots = fams.filter(M.isRootFamily), others = fams.filter(function(f){ return !M.isRootFamily(f); });
     var html = "";
-    if(roots.length) html += '<div class="grid-row roots">' + roots.map(familyCard).join("") + '</div>';
-    if(others.length) html += '<div class="grid-row">' + others.map(familyCard).join("") + '</div>';
+    if(roots.length) html += '<div class="grid-row roots">' + groupByFather(roots).map(groupCard).join("") + '</div>';
+    if(others.length) html += '<div class="grid-row">' + groupByFather(others).map(groupCard).join("") + '</div>';
     document.getElementById("grid").innerHTML = html ||
       '<div class="empty">' + (M.data.familles.length ? 'Aucune famille ne correspond à la recherche.' :
       'Aucune famille pour le moment. Ajoutez-en depuis <strong>admin.html</strong>.') + '</div>';
@@ -861,6 +908,8 @@ var UI = (function(){
   function renderFamily(id){
     var f = M.F[id];
     if(!f) return notFound("Famille");
+    var group = siblingsOfFamily(f);
+    if(group.length > 1) return renderMergedFamily(group);
     document.title = f.nom + " — " + (site().titre || "");
     var kids = M.childrenOfFamily(id);
     var origins = [f.pereId, f.mereId].map(function(pid){
@@ -877,6 +926,32 @@ var UI = (function(){
         var p = M.P[k];
         return '<a href="#/personne/' + encodeURIComponent(k) + '">' + avatar(p, 72) + '<b>' + esc(name(p)) + '</b><small>' + esc(Genea.birthText(p) || "") + '</small></a>';
       }).join("") + '</div>' : '') +
+      '</section>' + footer();
+  }
+
+  function renderMergedFamily(group){
+    var f0 = group[0];
+    var names = group.map(function(f){ return f.nom; }).filter(function(n, i, a){ return a.indexOf(n) === i; });
+    document.title = names.join(" / ") + " — " + (site().titre || "");
+    var pere = M.P[f0.pereId];
+    var origin = pere && pere.familleId && M.F[pere.familleId];
+    var total = 0;
+    var body = group.map(function(f){
+      var kids = M.childrenOfFamily(f.id); total += kids.length;
+      if(!kids.length) return "";
+      var mere = M.P[f.mereId];
+      return '<h3 class="sub-title">Avec ' + esc(mere ? name(mere) : "mère non renseignée") + ' (' + kids.length + ')</h3><div class="kid-grid">' + kids.map(function(k){
+        var p = M.P[k];
+        return '<a href="#/personne/' + encodeURIComponent(k) + '">' + avatar(p, 72) + '<b>' + esc(name(p)) + '</b><small>' + esc(Genea.birthText(p) || "") + '</small></a>';
+      }).join("") + '</div>';
+    }).join("");
+    app.innerHTML = header() +
+      '<header class="page-head"><p class="eyebrow">' + esc(gfName(f0.grandeFamilleId) ? "Grande Famille " + gfName(f0.grandeFamilleId) : "Famille") + '</p>' +
+      '<h1>' + esc(names.join(" / ")) + '</h1><div class="actions">' +
+      (f0.grandeFamilleId && M.GF[f0.grandeFamilleId] ? '<a class="btn" href="#/grande-famille/' + encodeURIComponent(f0.grandeFamilleId) + '">Voir l\'arbre généalogique</a>' : '') +
+      (origin ? '<a class="btn ghost" href="#/famille/' + encodeURIComponent(origin.id) + '">↑ ' + esc(origin.nom) + '</a>' : '') +
+      '</div></header><section class="family-page" style="max-width:1000px">' + multiCoupleHtml(group) +
+      (total ? '<h2 class="section-title" style="margin-top:1.5rem">Enfants (' + total + ')</h2>' + body : '') +
       '</section>' + footer();
   }
 
