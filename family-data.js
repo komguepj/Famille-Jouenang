@@ -164,22 +164,24 @@ window.FAMILY_DATA = {
       "prenom": "Marie",
       "nom": "Chimi",
       "sexe": "F",
-      "moisNaissance": null,
+      "moisNaissance": 10,
       "anneeNaissance": null,
       "photo": "",
       "familleId": null,
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": 8
     },
     {
       "id": "gilbert-enfant-1",
       "prenom": "Nina Arlette",
       "nom": "Djomo",
       "sexe": "F",
-      "moisNaissance": null,
+      "moisNaissance": 10,
       "anneeNaissance": null,
       "photo": "",
       "familleId": "famille-gilbert-gilbert-epouse",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": 17
     },
     {
       "id": "gilbert-enfant-2",
@@ -208,22 +210,24 @@ window.FAMILY_DATA = {
       "prenom": "Ines",
       "nom": "Menzefo",
       "sexe": "F",
-      "moisNaissance": null,
+      "moisNaissance": 9,
       "anneeNaissance": null,
       "photo": "",
       "familleId": "famille-gilbert-gilbert-epouse",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": 30
     },
     {
       "id": "gilbert-enfant-5",
       "prenom": "Ange Dany",
       "nom": "Lowe",
       "sexe": "",
-      "moisNaissance": null,
+      "moisNaissance": 11,
       "anneeNaissance": null,
       "photo": "",
       "familleId": "famille-gilbert-gilbert-epouse",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": 17
     },
     {
       "id": "gilbert-enfant-6",
@@ -263,11 +267,12 @@ window.FAMILY_DATA = {
       "prenom": "Nélaine",
       "nom": "Menzefo",
       "sexe": "F",
-      "moisNaissance": null,
+      "moisNaissance": 11,
       "anneeNaissance": null,
       "photo": "",
       "familleId": "famille-jean-lebel-jean-lebel-epouse",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": 19
     },
     {
       "id": "jean-lebel-enfant-2",
@@ -327,13 +332,14 @@ window.FAMILY_DATA = {
     {
       "id": "berthine-enfant-2",
       "prenom": "Marlene",
-      "nom": "Massuedom",
+      "nom": "Massudom",
       "sexe": "F",
       "moisNaissance": null,
       "anneeNaissance": null,
       "photo": "",
       "familleId": "famille-berthine-epoux-berthine",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": null
     },
     {
       "id": "berthine-enfant-3",
@@ -351,11 +357,12 @@ window.FAMILY_DATA = {
       "prenom": "Dagobert",
       "nom": "Djapou",
       "sexe": "M",
-      "moisNaissance": null,
+      "moisNaissance": 10,
       "anneeNaissance": null,
       "photo": "photos/dagobert.jpg",
       "familleId": "famille-abel-martine",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": 16
     },
     {
       "id": "dagobert-epouse",
@@ -377,18 +384,20 @@ window.FAMILY_DATA = {
       "anneeNaissance": null,
       "photo": "",
       "familleId": "famille-dagobert-dagobert-epouse",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": null
     },
     {
       "id": "dagobert-enfant-2",
-      "prenom": "Gloria",
-      "nom": "",
+      "prenom": "Anne Lea",
+      "nom": "Djapou",
       "sexe": "F",
-      "moisNaissance": null,
+      "moisNaissance": 11,
       "anneeNaissance": null,
       "photo": "",
       "familleId": "famille-dagobert-dagobert-epouse",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": 7
     },
     {
       "id": "claude",
@@ -461,11 +470,12 @@ window.FAMILY_DATA = {
       "prenom": "Jules",
       "nom": "Komguep",
       "sexe": "M",
-      "moisNaissance": null,
+      "moisNaissance": 9,
       "anneeNaissance": null,
-      "photo": "photos/jules.jpg",
+      "photo": "photos/Jules.jpg",
       "familleId": "famille-abel-martine",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": 8
     },
     {
       "id": "jules-epouse",
@@ -483,11 +493,12 @@ window.FAMILY_DATA = {
       "prenom": "Steve",
       "nom": "Jouenang",
       "sexe": "M",
-      "moisNaissance": null,
+      "moisNaissance": 10,
       "anneeNaissance": null,
       "photo": "",
       "familleId": "famille-jules-jules-epouse",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": 17
     },
     {
       "id": "jules-enfant-2",
@@ -549,11 +560,12 @@ window.FAMILY_DATA = {
       "prenom": "Valérie",
       "nom": "Nagfack",
       "sexe": "F",
-      "moisNaissance": null,
+      "moisNaissance": 10,
       "anneeNaissance": null,
       "photo": "photos/valerie.jpg",
       "familleId": "famille-abel-cecile",
-      "grandeFamilleId": "jouenang"
+      "grandeFamilleId": "jouenang",
+      "jourNaissance": 6
     },
     {
       "id": "bertin",
