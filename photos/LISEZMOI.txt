@@ -1,0 +1,2 @@
+Déposez ici les photos (jpg, png, webp).
+Le chemin indiqué dans admin.html doit correspondre, par exemple : photos/gilbert.jpg

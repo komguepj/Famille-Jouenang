@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration — Plusieurs Branches, une Même Racine</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#1E7A4D; --bg-deep-2:#14582F; --bg-card:rgba(10,52,28,0.55);
+  --ivory:#FFFBF0; --parchment:#FFF3D6; --parchment-2:#F4E3B8;
+  --gold:#F4B942; --gold-light:#FFD873; --wood:#B5652F; --wood-light:#E8935A;
+  --sage:#2E9B63; --sage-light:#7FE0A8; --ink:#16311F; --danger:#FF8A7A;
+  --shadow:rgba(9,41,23,0.4); --line:rgba(255,243,214,0.18);
+  --font-display:"Fraunces","Iowan Old Style",Georgia,serif;
+  --font-body:"Work Sans","Segoe UI",system-ui,sans-serif;
+  --font-label:"Space Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,var(--bg-deep-2),var(--bg-deep) 70%) fixed;background-color:var(--bg-deep-2);color:var(--ivory);font-family:var(--font-body);-webkit-font-smoothing:antialiased;line-height:1.45}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit}
+:focus-visible{outline:3px solid var(--gold-light);outline-offset:3px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+.hidden{display:none!important}
+
+/* avatars */
+.avatar{position:relative;display:inline-flex;align-items:center;justify-content:center;flex:none;width:var(--sz,64px);height:var(--sz,64px);border-radius:50%;overflow:hidden;background:var(--bg-deep-2);box-shadow:0 4px 14px var(--shadow);border:2px solid var(--ring,var(--wood-light))}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.avatar .ini{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:600;font-size:calc(var(--sz,64px) * .36);color:var(--ink);background:var(--avatar-color,var(--gold))}
+.avatar.m{--ring:var(--sage-light)} .avatar.f{--ring:var(--wood-light)}
+
+.eyebrow{font-family:var(--font-label);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--sage-light)}
+.chip{display:inline-flex;align-items:center;gap:.35rem;font-family:var(--font-label);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;padding:.28rem .65rem;border-radius:999px;border:1px solid rgba(244,185,66,.45);color:var(--gold-light);background:rgba(244,185,66,.08);white-space:nowrap}
+a.chip:hover{background:rgba(244,185,66,.2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;padding:.6rem 1.1rem;border-radius:10px;border:1px solid rgba(255,216,115,.4);background:linear-gradient(160deg,var(--wood-light),var(--wood));color:var(--ivory);font-weight:600;cursor:pointer;box-shadow:0 6px 18px var(--shadow);transition:transform .2s,border-color .2s}
+.btn:hover{transform:translateY(-2px);border-color:var(--gold-light)}
+.btn.ghost{background:transparent;box-shadow:none;border-color:rgba(255,243,214,.35);color:var(--parchment)}
+.btn.ghost:hover{border-color:var(--gold-light);color:var(--gold-light)}
+.btn.small{padding:.35rem .7rem;font-size:.85rem;border-radius:8px}
+.btn.danger{background:transparent;border-color:rgba(255,138,122,.5);color:var(--danger);box-shadow:none}
+.badge-deduit{font-family:var(--font-label);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;padding:.08rem .38rem;border-radius:4px;background:rgba(127,224,168,.14);color:var(--sage-light);margin-left:.3rem;vertical-align:middle}
+
+
+.top{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1rem;justify-content:space-between;padding:.8rem 1.25rem;background:rgba(20,88,47,.95);border-bottom:1px solid rgba(244,185,66,.3);backdrop-filter:blur(6px)}
+.top h1{margin:0;font-family:var(--font-display);font-weight:600;font-size:1.15rem;color:var(--gold-light)}
+.top h1 small{display:block;font-family:var(--font-label);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sage-light);font-weight:400}
+.top .acts{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center}
+.status{font-family:var(--font-label);font-size:.68rem;letter-spacing:.06em;padding:.3rem .6rem;border-radius:6px}
+.status.dirty{background:rgba(244,185,66,.2);color:var(--gold-light)}
+.status.clean{background:rgba(127,224,168,.14);color:var(--sage-light)}
+
+.tabs{display:flex;gap:.3rem;flex-wrap:wrap;padding:1rem 1.25rem 0;max-width:1200px;margin:0 auto}
+.tabs button{cursor:pointer;background:transparent;border:1px solid var(--line);color:var(--parchment);padding:.55rem 1rem;border-radius:10px 10px 0 0;border-bottom:none}
+.tabs button.on{background:var(--bg-card);color:var(--gold-light);border-color:rgba(244,185,66,.4)}
+main{max-width:1200px;margin:0 auto;padding:0 1.25rem 4rem}
+.panel{background:var(--bg-card);border:1px solid rgba(244,185,66,.25);border-radius:0 14px 14px 14px;padding:1.2rem}
+.panel-head{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.panel-head h2{margin:0;font-family:var(--font-display);font-weight:600;font-size:1.3rem}
+.help{font-size:.88rem;color:var(--parchment-2);margin:.2rem 0 1rem;max-width:760px}
+
+input[type=text],input[type=number],input[type=search],select,textarea{width:100%;padding:.55rem .7rem;border-radius:8px;border:1px solid var(--line);background:rgba(0,0,0,.22);color:var(--ivory)}
+select option,select optgroup{background:#12492a;color:var(--ivory)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--gold);outline-offset:1px}
+label.f{display:flex;flex-direction:column;gap:.3rem;font-size:.8rem;color:var(--parchment-2)}
+label.f>span{font-family:var(--font-label);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sage-light)}
+.row{display:grid;gap:.8rem}
+.row.c2{grid-template-columns:1fr 1fr}
+.row.c3{grid-template-columns:1fr 1fr 1fr}
+.filters{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.9rem}
+.filters>*{flex:1 1 200px;width:auto}
+
+.plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.5rem}
+.pitem{display:flex;align-items:center;gap:.7rem;padding:.55rem .7rem;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.12);cursor:pointer;text-align:left;color:inherit;width:100%}
+.pitem:hover{border-color:var(--gold-light)}
+.pitem b{display:block;font-weight:600}
+.pitem small{display:block;font-size:.76rem;color:var(--parchment-2);opacity:.85}
+.warn-dot{color:var(--gold);font-size:.75rem}
+
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:.8rem}
+.fitem{border:1px solid var(--line);border-radius:14px;padding:.9rem;background:rgba(0,0,0,.12);display:flex;flex-direction:column;gap:.6rem}
+.ord{display:flex;align-items:center;gap:.3rem;font-family:var(--font-label);font-size:.7rem;color:var(--gold-light);flex:none}
+.ord input{width:64px;padding:.3rem .4rem;text-align:center}
+.fitem h3{margin:0;font-family:var(--font-display);font-weight:600;font-size:1.05rem}
+.fitem .pp{display:flex;gap:.8rem;align-items:center;font-size:.88rem}
+.fitem .pp span{display:flex;align-items:center;gap:.4rem;min-width:0}
+.fitem .kidsline{font-size:.82rem;color:var(--parchment-2)}
+.fitem .btns{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:auto}
+
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:.5rem .5rem;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-family:var(--font-label);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--sage-light);font-weight:400}
+td a{color:var(--gold-light)}
+
+.addrel{display:grid;grid-template-columns:auto 1fr auto 1fr auto;gap:.5rem;align-items:center;margin:.6rem 0}
+.addrel .t{font-size:.85rem;color:var(--parchment-2);white-space:nowrap}
+
+dialog{border:1px solid rgba(244,185,66,.4);border-radius:18px;background:#135a33;color:var(--ivory);padding:0;width:min(760px,calc(100vw - 24px));max-height:calc(100vh - 24px);box-shadow:0 30px 80px rgba(0,0,0,.5)}
+dialog::backdrop{background:rgba(5,25,14,.7)}
+.dlg-head{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.2rem;border-bottom:1px solid var(--line);position:sticky;top:0;background:#135a33;z-index:2}
+.dlg-head h2{margin:0;font-family:var(--font-display);font-weight:600;font-size:1.25rem}
+.dlg-body{padding:1.1rem 1.2rem;display:flex;flex-direction:column;gap:1rem}
+.dlg-foot{display:flex;justify-content:space-between;gap:.5rem;padding:.9rem 1.2rem;border-top:1px solid var(--line);position:sticky;bottom:0;background:#135a33}
+.dlg-foot .r{display:flex;gap:.5rem}
+.x{background:transparent;border:0;color:var(--parchment);font-size:1.4rem;cursor:pointer;line-height:1}
+fieldset{border:1px solid var(--line);border-radius:12px;padding:.8rem .9rem;margin:0}
+legend{font-family:var(--font-label);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-light);padding:0 .4rem}
+.photo-row{display:flex;gap:1rem;align-items:center}
+.photo-row .grow{flex:1;display:flex;flex-direction:column;gap:.4rem}
+.hint{font-size:.78rem;color:var(--parchment-2);opacity:.85;margin:0}
+.radios{display:flex;gap:1rem;flex-wrap:wrap;padding:.35rem 0}
+.radios label{display:flex;align-items:center;gap:.3rem;font-size:.92rem;cursor:pointer}
+.rel-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.3rem}
+.rel-list li{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.35rem .5rem;border-radius:8px;background:rgba(0,0,0,.15);font-size:.9rem}
+.ded-list{columns:2 240px;font-size:.85rem;margin:0;padding-left:1.1rem;color:var(--parchment-2)}
+.ded-list b{color:var(--ivory);font-weight:500}
+.sel-add{display:flex;gap:.4rem}
+.sel-add select{flex:1}
+.issues{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.35rem;font-size:.9rem}
+.issues li{padding:.45rem .7rem;border-radius:8px;background:rgba(244,185,66,.1);border-left:3px solid var(--gold)}
+.issues li.ok{background:rgba(127,224,168,.1);border-color:var(--sage-light)}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--ink);padding:.6rem 1.1rem;border-radius:10px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.4);z-index:100;transition:opacity .3s}
+.muted{color:var(--parchment-2);opacity:.8}
+
+@media (max-width:700px){
+  .row.c2,.row.c3{grid-template-columns:1fr}
+  .addrel{grid-template-columns:1fr}
+  .photo-row{flex-direction:column;align-items:flex-start}
+  .tabs button{padding:.45rem .7rem;font-size:.88rem}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1><small>Administration</small><span id="siteTitle">Plusieurs Branches, une Même Racine</span></h1>
+  <div class="acts">
+    <span class="status clean" id="status">À jour</span>
+    <label class="btn ghost small" title="Charger un family-data.json existant">Importer<input type="file" id="importFile" accept=".json,application/json" hidden></label>
+    <a class="btn ghost small" href="index.html?apercu=1" target="_blank" rel="noopener" title="Voir le site avec les modifications non exportées">Aperçu du site</a>
+    <button class="btn small" id="exportBtn" type="button">⬇ Exporter les données</button>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="personnes" class="on">Personnes</button>
+  <button data-tab="familles">Familles</button>
+  <button data-tab="grandes">Grandes Familles</button>
+  <button data-tab="relations">Relations</button>
+  <button data-tab="reglages">Réglages &amp; données</button>
+</nav>
+<main><section class="panel" id="panel"></section></main>
+
+<dialog id="dlg"></dialog>
+<dialog id="dlg2"></dialog>
+
+<script>
+/* ==========================================================
+   MOTEUR DE PARENTÉ — partagé par index.html et admin.html
+   ----------------------------------------------------------
+   Toutes les relations sont ramenées à un "chemin" (u, d) :
+   depuis X, monter de u générations jusqu'à un ancêtre commun,
+   puis descendre de d générations pour atteindre Y.
+     (1,0) parent        (0,1) enfant        (1,1) frère/sœur
+     (2,0) grand-parent  (0,2) petit-enfant  (2,1) oncle/tante
+     (1,2) neveu/nièce   (2,2) cousin(e)     etc.
+   Les déductions composent ces chemins selon des règles sûres
+   (voir composer()). La belle-famille est ensuite calculée à
+   partir des conjoints.
+   ========================================================== */
+var Genea = (function(){
+
+  // "A est <type> de B"  →  chemin de B vers A
+  var REL_TYPES = {
+    "parent":               { label: "Père / Mère",                 u: 1, d: 0 },
+    "enfant":               { label: "Fils / Fille",                u: 0, d: 1 },
+    "fratrie":              { label: "Frère / Sœur",                u: 1, d: 1, sib: true },
+    "grand-parent":         { label: "Grand-père / Grand-mère",     u: 2, d: 0 },
+    "petit-enfant":         { label: "Petit-fils / Petite-fille",   u: 0, d: 2 },
+    "oncle":                { label: "Oncle / Tante",               u: 2, d: 1 },
+    "neveu":                { label: "Neveu / Nièce",               u: 1, d: 2 },
+    "cousin":               { label: "Cousin / Cousine",            u: 2, d: 2 },
+    "grand-oncle":          { label: "Grand-oncle / Grand-tante",   u: 3, d: 1 },
+    "petit-neveu":          { label: "Petit-neveu / Petite-nièce",  u: 1, d: 3 },
+    "arriere-grand-parent": { label: "Arrière-grand-parent",        u: 3, d: 0 },
+    "arriere-petit-enfant": { label: "Arrière-petit-enfant",        u: 0, d: 3 },
+    "conjoint":             { label: "Mari / Épouse",               spouse: true },
+    "beau-frere":           { label: "Beau-frère / Belle-sœur",     direct: ["Beau-frère","Belle-sœur"], inverse: "beau-frere" },
+    "beau-parent":          { label: "Beau-père / Belle-mère",      direct: ["Beau-père","Belle-mère"], inverse: "gendre" },
+    "gendre":               { label: "Gendre / Belle-fille",        direct: ["Gendre","Belle-fille"], inverse: "beau-parent" }
+  };
+
+  var MAX_GEN = 6;
+  var MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+
+  function g(sex, m, f){
+    if(sex === "M") return m;
+    if(sex === "F") return f;
+    return m + " / " + f;
+  }
+  function arr(k){ var s = ""; for(var i = 0; i < k; i++) s += "arrière-"; return s; }
+  function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  // Libellé de Y vu depuis X (chemin u,d), selon le sexe de Y
+  function bloodLabel(u, d, sex, demi){
+    var s;
+    if(d === 0){
+      if(u === 1) s = g(sex, "père", "mère");
+      else if(u === 2) s = g(sex, "grand-père", "grand-mère");
+      else s = arr(u - 2) + g(sex, "grand-père", "grand-mère");
+    }else if(u === 0){
+      if(d === 1) s = g(sex, "fils", "fille");
+      else if(d === 2) s = g(sex, "petit-fils", "petite-fille");
+      else s = arr(d - 2) + g(sex, "petit-fils", "petite-fille");
+    }else if(u === 1 && d === 1){
+      s = (demi ? "demi-" : "") + g(sex, "frère", "sœur");
+    }else if(d === 1){
+      if(u === 2) s = g(sex, "oncle", "tante");
+      else if(u === 3) s = g(sex, "grand-oncle", "grand-tante");
+      else s = arr(u - 3) + g(sex, "grand-oncle", "grand-tante");
+    }else if(u === 1){
+      if(d === 2) s = g(sex, "neveu", "nièce");
+      else if(d === 3) s = g(sex, "petit-neveu", "petite-nièce");
+      else s = arr(d - 3) + g(sex, "petit-neveu", "petite-nièce");
+    }else if(u === d){
+      if(u === 2) s = g(sex, "cousin germain", "cousine germaine");
+      else if(u === 3) s = g(sex, "cousin issu de germain", "cousine issue de germain");
+      else s = g(sex, "cousin", "cousine") + " au " + (u - 1) + "e degré";
+    }else if(u - d === 1){
+      s = g(sex, "oncle", "tante") + " à la mode de Bretagne";
+    }else if(d - u === 1){
+      s = g(sex, "neveu", "nièce") + " à la mode de Bretagne";
+    }else{
+      s = g(sex, "cousin éloigné", "cousine éloignée");
+    }
+    return cap(s);
+  }
+
+  function category(u, d){
+    if(d === 0) return u === 1 ? "parents" : "ancetres";
+    if(u === 0) return d === 1 ? "enfants" : "descendants";
+    if(u === 1 && d === 1) return "fratrie";
+    if(d === 1) return "oncles";
+    if(u === 1) return "neveux";
+    return "cousins";
+  }
+
+  var CATEGORIES = [
+    ["parents", "Parents"], ["conjoints", "Conjoint(s)"], ["fratrie", "Frères & sœurs"],
+    ["enfants", "Enfants"], ["ancetres", "Grands-parents & aïeux"], ["descendants", "Petits-enfants & descendance"],
+    ["oncles", "Oncles & tantes"], ["neveux", "Neveux & nièces"], ["cousins", "Cousins & cousines"],
+    ["alliance", "Belle-famille"]
+  ];
+
+  function slug(str){
+    return String(str || "").normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "x";
+  }
+
+  function fullName(p){
+    if(!p) return "?";
+    return [p.prenom, p.nom].filter(Boolean).join(" ") || "(sans nom)";
+  }
+
+  function birthText(p){
+    if(!p || !p.anneeNaissance) return "";
+    var m = p.moisNaissance ? MOIS[p.moisNaissance - 1] + " " : "";
+    return m + p.anneeNaissance;
+  }
+
+  /* ------------------------------------------------------
+     Construction du modèle
+     ------------------------------------------------------ */
+  function build(data){
+    data = data || {};
+    var personnes = data.personnes || [];
+    var familles = data.familles || [];
+    var grandes = data.grandesFamilles || [];
+    var relations = data.relations || [];
+
+    var P = {}, F = {}, GF = {};
+    personnes.forEach(function(p){ P[p.id] = p; });
+    familles.forEach(function(f){ F[f.id] = f; });
+    grandes.forEach(function(gf){ GF[gf.id] = gf; });
+
+    var parentsOf = {}, childrenOf = {}, spousesOf = {}, adj = {};
+    personnes.forEach(function(p){ parentsOf[p.id] = []; childrenOf[p.id] = []; spousesOf[p.id] = []; adj[p.id] = []; });
+
+    function pushUniq(arr, v){ if(arr.indexOf(v) < 0) arr.push(v); }
+    function addParent(child, parent){
+      if(!P[child] || !P[parent] || child === parent) return;
+      pushUniq(parentsOf[child], parent);
+      pushUniq(childrenOf[parent], child);
+    }
+    function addSpouse(a, b){
+      if(!P[a] || !P[b] || a === b) return;
+      pushUniq(spousesOf[a], b); pushUniq(spousesOf[b], a);
+    }
+    // arête de x vers y : chemin (u,d) de x jusqu'à y
+    function addEdge(x, y, u, d, sib, src){
+      if(!P[x] || !P[y] || x === y) return;
+      adj[x].push({ to: y, u: u, d: d, sib: !!sib, src: src });
+      adj[y].push({ to: x, u: d, d: u, sib: !!sib, src: src });
+    }
+
+    // 1. Structure issue des familles (couple + enfants)
+    familles.forEach(function(f){
+      if(f.pereId && f.mereId) addSpouse(f.pereId, f.mereId);
+    });
+    personnes.forEach(function(p){
+      var f = p.familleId && F[p.familleId];
+      if(!f) return;
+      if(f.pereId) addParent(p.id, f.pereId);
+      if(f.mereId) addParent(p.id, f.mereId);
+    });
+
+    // 2. Relations déclarées
+    var directLabels = {}; // directLabels[a][b] = type (a est <type> de b)
+    relations.forEach(function(r){
+      var t = REL_TYPES[r.type];
+      if(!t || !P[r.a] || !P[r.b] || r.a === r.b) return;
+      if(t.spouse) addSpouse(r.a, r.b);
+      else if(t.direct){
+        (directLabels[r.a] = directLabels[r.a] || {})[r.b] = r.type;
+        if(t.inverse) (directLabels[r.b] = directLabels[r.b] || {})[r.a] = t.inverse;
+      }
+      else if(r.type === "parent") addParent(r.b, r.a);
+      else if(r.type === "enfant") addParent(r.a, r.b);
+      else addEdge(r.b, r.a, t.u, t.d, t.sib, "declare");
+    });
+
+    // 3. Arêtes parent/enfant
+    personnes.forEach(function(p){
+      parentsOf[p.id].forEach(function(par){ addEdge(p.id, par, 1, 0, false, "famille"); });
+    });
+
+    // 4. Frères/sœurs germains implicites (mêmes parents connus)
+    //    → permet d'appliquer aux frères/sœurs les règles de fratrie
+    personnes.forEach(function(p){
+      var pa = parentsOf[p.id];
+      if(!pa.length) return;
+      personnes.forEach(function(q){
+        if(q.id <= p.id) return;
+        var qa = parentsOf[q.id];
+        if(qa.length !== pa.length) return;
+        for(var i = 0; i < pa.length; i++) if(qa.indexOf(pa[i]) < 0) return;
+        addEdge(p.id, q.id, 1, 1, true, "implicite");
+      });
+    });
+
+    /* --------------------------------------------------
+       Recherche des parents par le sang depuis X
+       Règles de composition sûres :
+        - depuis X ou un de ses ancêtres (d = 0), on peut
+          emprunter n'importe quelle relation ;
+        - un frère/une sœur d'un ancêtre partage les mêmes
+          ascendants (état "lat") ;
+        - après être descendu (d ≥ 1), on peut seulement
+          continuer à descendre, ou passer à un frère/sœur.
+       (Le cousin d'un cousin n'est donc pas forcément
+        cousin : il peut venir de l'autre côté de la famille.)
+       -------------------------------------------------- */
+    var bloodCache = {};
+    function blood(x){
+      if(bloodCache[x]) return bloodCache[x];
+      var best = {};
+      var seen = {};
+      var queue = [{ n: x, u: 0, d: 0, lat: false, len: 0, src: null }];
+      seen[x + "|0|0|0"] = 1;
+      while(queue.length){
+        var s = queue.shift();
+        if(s.n !== x){
+          var eu = s.lat ? s.u + 1 : s.u, ed = s.lat ? 1 : s.d;
+          var cur = best[s.n];
+          var score = eu + ed;
+          if(!cur || score < cur.u + cur.d || (score === cur.u + cur.d && s.len < cur.len)){
+            best[s.n] = { u: eu, d: ed, len: s.len, src: s.len === 1 ? s.src : "deduit" };
+          }
+        }
+        var edges = adj[s.n] || [];
+        for(var i = 0; i < edges.length; i++){
+          var e = edges[i], nu, nd, nl = false;
+          if(s.d === 0 && !s.lat){
+            if(e.sib){ nu = s.u; nd = 0; nl = true; }
+            else { nu = s.u + e.u; nd = e.d; }
+          }else if(s.d === 0 && s.lat){
+            if(e.sib){ nu = s.u; nd = 0; nl = true; }
+            else if(e.u >= 1){ nu = s.u + e.u; nd = e.d; }
+            else { nu = s.u + 1; nd = 1 + e.d; }
+          }else{
+            if(e.u === 0){ nu = s.u; nd = s.d + e.d; }
+            else if(e.sib){ nu = s.u; nd = s.d; }
+            else continue;
+          }
+          if(nu > MAX_GEN || nd > MAX_GEN) continue;
+          var key = e.to + "|" + nu + "|" + nd + "|" + (nl ? 1 : 0);
+          if(seen[key]) continue;
+          seen[key] = 1;
+          queue.push({ n: e.to, u: nu, d: nd, lat: nl, len: s.len + 1, src: e.src });
+        }
+      }
+      delete best[x];
+      bloodCache[x] = best;
+      return best;
+    }
+
+    function isDemi(x, y){
+      var a = parentsOf[x] || [], b = parentsOf[y] || [];
+      if(a.length < 2 || b.length < 2) return false;
+      var shared = a.filter(function(v){ return b.indexOf(v) >= 0; }).length;
+      if(shared !== 1) return false;
+      // une fratrie déclarée explicitement l'emporte
+      return !(adj[x] || []).some(function(e){ return e.to === y && e.src === "declare" && e.sib; });
+    }
+
+    /* --------------------------------------------------
+       Toutes les relations de X : sang, conjoints, alliance
+       Renvoie [{ id, label, cat, src }]  (label = "Y est ... de X")
+       -------------------------------------------------- */
+    function relationsOf(x){
+      if(!P[x]) return [];
+      var out = {};
+      var b = blood(x);
+      Object.keys(b).forEach(function(y){
+        var r = b[y];
+        var demi = r.u === 1 && r.d === 1 && isDemi(x, y);
+        out[y] = { id: y, label: bloodLabel(r.u, r.d, P[y].sexe, demi), cat: category(r.u, r.d),
+                   src: r.src === "implicite" ? "deduit" : r.src, u: r.u, d: r.d };
+      });
+      function setIf(y, label, src){
+        if(y === x || out[y] || !P[y]) return;
+        out[y] = { id: y, label: label, cat: "alliance", src: src };
+      }
+      // conjoints
+      spousesOf[x].forEach(function(s){
+        if(out[s]) return;
+        out[s] = { id: s, label: g(P[s].sexe, "Mari", "Épouse"), cat: "conjoints", src: "famille" };
+      });
+      // parents par le sang du conjoint
+      spousesOf[x].forEach(function(s){
+        var bs = blood(s);
+        Object.keys(bs).forEach(function(z){
+          var r = bs[z], sx = P[z] && P[z].sexe, lab;
+          if(r.u === 1 && r.d === 0) lab = g(sx, "Beau-père", "Belle-mère");
+          else if(r.u === 1 && r.d === 1) lab = g(sx, "Beau-frère", "Belle-sœur");
+          else if(r.u === 0 && r.d === 1) lab = g(sx, "Beau-fils", "Belle-fille") + " (enfant du conjoint)";
+          else lab = bloodLabel(r.u, r.d, sx, false) + " par alliance";
+          setIf(z, lab, "deduit");
+        });
+      });
+      // conjoints de mes parents par le sang
+      Object.keys(b).forEach(function(y){
+        var r = b[y];
+        spousesOf[y].forEach(function(t){
+          var sx = P[t] && P[t].sexe, lab;
+          if(r.u === 1 && r.d === 0) lab = g(sx, "Beau-père", "Belle-mère");
+          else if(r.u === 0 && r.d === 1) lab = g(sx, "Gendre", "Belle-fille");
+          else if(r.u === 1 && r.d === 1) lab = g(sx, "Beau-frère", "Belle-sœur");
+          else lab = bloodLabel(r.u, r.d, sx, false) + " par alliance";
+          setIf(t, lab, "deduit");
+        });
+      });
+      // conjoints des frères/sœurs de mon conjoint
+      spousesOf[x].forEach(function(s){
+        var bs = blood(s);
+        Object.keys(bs).forEach(function(z){
+          if(bs[z].u === 1 && bs[z].d === 1){
+            spousesOf[z].forEach(function(t){ setIf(t, g(P[t] && P[t].sexe, "Beau-frère", "Belle-sœur"), "deduit"); });
+          }
+        });
+      });
+      // étiquettes d'alliance déclarées directement (y est <type> de x)
+      Object.keys(directLabels).forEach(function(a){
+        var t = directLabels[a][x];
+        if(t) setIf(a, g(P[a].sexe, REL_TYPES[t].direct[0], REL_TYPES[t].direct[1]), "declare");
+      });
+      return Object.keys(out).map(function(k){ return out[k]; });
+    }
+
+    /* --------------------------------------------------
+       Arbre généalogique d'une Grande Famille
+       -------------------------------------------------- */
+    function unionsOf(pid){
+      var map = {}, order = [];
+      childrenOf[pid].forEach(function(c){
+        var other = parentsOf[c].filter(function(q){ return q !== pid; })[0] || "";
+        if(!map[other]){ map[other] = []; order.push(other); }
+        map[other].push(c);
+      });
+      spousesOf[pid].forEach(function(s){ if(!map[s]){ map[s] = []; order.push(s); } });
+      return order.map(function(o){
+        return { spouse: o || null, children: map[o].slice().sort(byBirth) };
+      });
+    }
+
+    function byBirth(a, b){
+      var pa = P[a], pb = P[b];
+      var ya = (pa.anneeNaissance || 9999) * 13 + (pa.moisNaissance || 0);
+      var yb = (pb.anneeNaissance || 9999) * 13 + (pb.moisNaissance || 0);
+      if(ya !== yb) return ya - yb;
+      return (pa._ord || 0) - (pb._ord || 0);
+    }
+    personnes.forEach(function(p, i){ Object.defineProperty(p, "_ord", { value: i, enumerable: false, configurable: true, writable: true }); });
+
+    function grandeFamilleOf(p){
+      if(!p) return null;
+      if(p.grandeFamilleId && GF[p.grandeFamilleId]) return p.grandeFamilleId;
+      var f = p.familleId && F[p.familleId];
+      if(f && f.grandeFamilleId) return f.grandeFamilleId;
+      var head = familles.filter(function(f){ return f.pereId === p.id || f.mereId === p.id; })[0];
+      return head ? head.grandeFamilleId : null;
+    }
+
+    // Renvoie une liste de racines (nœuds imbriqués) pour la Grande Famille
+    function treeOf(gfId){
+      var members = {};
+      personnes.forEach(function(p){ if(grandeFamilleOf(p) === gfId) members[p.id] = 1; });
+      familles.forEach(function(f){
+        if(f.grandeFamilleId !== gfId) return;
+        if(f.pereId) members[f.pereId] = 1;
+        if(f.mereId) members[f.mereId] = 1;
+      });
+      var cands = Object.keys(members).filter(function(id){
+        if(!P[id] || parentsOf[id].length) return false;
+        // conjoint(e) venu(e) d'ailleurs : il/elle apparaîtra à côté de son/sa partenaire
+        var partners = spousesOf[id].concat(childrenOf[id].reduce(function(acc, c){ return acc.concat(parentsOf[c]); }, []));
+        return !partners.some(function(q){ return q !== id && parentsOf[q] && parentsOf[q].length; });
+      });
+      cands.sort(function(a, b){
+        var ua = unionsOf(a).length, ub = unionsOf(b).length;
+        if(ua !== ub) return ub - ua;
+        var sa = P[a].sexe === "M" ? 0 : 1, sb = P[b].sexe === "M" ? 0 : 1;
+        if(sa !== sb) return sa - sb;
+        return byBirth(a, b);
+      });
+      var visited = {};
+      function node(pid, depth){
+        visited[pid] = 1;
+        var n = { id: pid, unions: [] };
+        if(depth > 12) return n;
+        unionsOf(pid).forEach(function(u){
+          if(u.spouse) visited[u.spouse] = 1;
+          n.unions.push({
+            spouse: u.spouse,
+            children: u.children.filter(function(c){ return !visited[c]; }).map(function(c){ return node(c, depth + 1); })
+          });
+        });
+        return n;
+      }
+      var roots = [];
+      cands.forEach(function(id){ if(!visited[id]) roots.push(node(id, 0)); });
+      return roots;
+    }
+
+    function familiesHeadedBy(pid){
+      return familles.filter(function(f){ return f.pereId === pid || f.mereId === pid; });
+    }
+    function childrenOfFamily(fid){
+      return personnes.filter(function(p){ return p.familleId === fid; }).map(function(p){ return p.id; }).sort(byBirth);
+    }
+
+    // Famille "fondatrice" : aucun des parents n'est enfant d'une autre famille
+    function isRootFamily(f){
+      var heads = [f.pereId, f.mereId].filter(function(id){ return P[id]; });
+      return heads.length > 0 && heads.every(function(id){ return !(P[id].familleId && F[P[id].familleId]); });
+    }
+    // Ordre de l'arbre : génération par génération, puis ordre des enfants
+    // dans la famille d'origine (année de naissance, sinon ordre de saisie)
+    function orderedFamilies(){
+      var out = [], seen = {};
+      var level = familles.filter(isRootFamily);
+      while(level.length){
+        var next = [];
+        level.forEach(function(f){ if(!seen[f.id]){ seen[f.id] = 1; out.push(f); } });
+        level.forEach(function(f){
+          childrenOfFamily(f.id).forEach(function(c){
+            familiesHeadedBy(c).forEach(function(cf){ if(!seen[cf.id] && next.indexOf(cf) < 0) next.push(cf); });
+          });
+        });
+        level = next;
+      }
+      familles.forEach(function(f){ if(!seen[f.id]) out.push(f); }); // familles non reliées
+      // Numéro d'ordre choisi dans l'administration : il l'emporte sur l'ordre
+      // automatique. Les familles sans numéro viennent ensuite.
+      var auto = {};
+      out.forEach(function(f, i){ auto[f.id] = i; });
+      function key(f){ var n = parseFloat(f.ordre); return isNaN(n) ? Infinity : n; }
+      return out.sort(function(a, b){
+        var ka = key(a), kb = key(b);
+        if(ka !== kb) return ka < kb ? -1 : 1;
+        return auto[a.id] - auto[b.id];
+      });
+    }
+
+    return {
+      P: P, F: F, GF: GF, data: data,
+      isRootFamily: isRootFamily, orderedFamilies: orderedFamilies,
+      parentsOf: parentsOf, childrenOf: childrenOf, spousesOf: spousesOf,
+      relationsOf: relationsOf, treeOf: treeOf, unionsOf: unionsOf,
+      grandeFamilleOf: grandeFamilleOf, familiesHeadedBy: familiesHeadedBy,
+      childrenOfFamily: childrenOfFamily
+    };
+  }
+
+  function emptyData(){
+    return {
+      site: { titre: "Plusieurs Branches, une Même Racine", sousTitre: "" },
+      grandesFamilles: [], familles: [], personnes: [], relations: []
+    };
+  }
+
+  return {
+    REL_TYPES: REL_TYPES, CATEGORIES: CATEGORIES, MOIS: MOIS,
+    build: build, slug: slug, fullName: fullName, birthText: birthText,
+    bloodLabel: bloodLabel, emptyData: emptyData
+  };
+})();
+
+
+</script>
+<script>
+var UI = (function(){
+  var COLORS = ["#F4B942","#7FE0A8","#E8935A","#FFD873","#2E9B63","#FF9F6E"];
+  function esc(s){
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+    });
+  }
+  function initials(p){
+    var a = (p.prenom || "").trim(), b = (p.nom || "").trim();
+    if(a && b) return (a[0] + b[0]).toUpperCase();
+    var w = (a || b || "?").split(/[\s-]+/).filter(Boolean);
+    return w.length > 1 ? (w[0][0] + w[1][0]).toUpperCase() : (w[0] || "?").slice(0, 2).toUpperCase();
+  }
+  function color(id){
+    var h = 0; id = String(id || "");
+    for(var i = 0; i < id.length; i++) h = id.charCodeAt(i) + ((h << 5) - h);
+    return COLORS[Math.abs(h) % COLORS.length];
+  }
+  // photoOverride : URL temporaire (aperçu dans l'admin)
+  function avatar(p, size, photoOverride){
+    if(!p) return "";
+    var src = photoOverride || p.photo;
+    var cls = "avatar" + (p.sexe === "M" ? " m" : p.sexe === "F" ? " f" : "");
+    var st = "--sz:" + (size || 64) + "px;--avatar-color:" + color(p.id);
+    var ini = '<span class="ini"' + (src ? ' style="display:none"' : "") + ">" + esc(initials(p)) + "</span>";
+    var img = "";
+    // en cas d'erreur de chargement, on affiche les initiales
+    if(src) img ='<img src="' + esc(src) + '" alt="" onerror="this.nextElementSibling.style.display=\'flex\';this.remove()">';
+    return '<span class="' + cls + '" style="' + st + '">' + img + ini + "</span>";
+  }
+  /* Chargement des données :
+     1) family-data.json (site hébergé ou serveur local)
+     2) sinon family-data.js — fonctionne aussi en ouvrant la page par double-clic */
+  function loadData(){
+    function viaScript(){
+      return new Promise(function(resolve, reject){
+        window.FAMILY_DATA = undefined;
+        var s = document.createElement("script");
+        s.src = "family-data.js?v=" + Date.now();
+        s.onload = function(){ window.FAMILY_DATA ? resolve(window.FAMILY_DATA) : reject(new Error("vide")); };
+        s.onerror = function(){ reject(new Error("absent")); };
+        document.head.appendChild(s);
+      });
+    }
+    if(location.protocol === "file:") return viaScript();
+    return fetch("family-data.json", { cache: "no-store" })
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .catch(viaScript);
+  }
+  function dataToJs(data){
+    return "/* Copie de family-data.json lisible par double-clic (générée par admin.html). Ne pas modifier à la main. */\n" +
+      "window.FAMILY_DATA = " + JSON.stringify(data, null, 2) + ";\n";
+  }
+  return { esc: esc, avatar: avatar, initials: initials, loadData: loadData, dataToJs: dataToJs };
+})();
+
+</script>
+<script>
+(function(){
+  "use strict";
+  var esc = UI.esc, avatar = UI.avatar, name = Genea.fullName, T = Genea.REL_TYPES;
+  var DRAFT_KEY = "genea-admin-draft", BASE_KEY = "genea-admin-base";
+  var DATA = Genea.emptyData(), M = null, BASE = "", tab = "personnes";
+  var photoPreviews = {}; // chemin → URL temporaire pour l'aperçu
+  var ui = { q: "", gf: "", fam: "" };
+
+  /* ---------- Stockage ---------- */
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lsSet(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
+  function normalize(d){
+    d = d || {};
+    var e = Genea.emptyData();
+    return {
+      site: Object.assign(e.site, d.site || {}),
+      grandesFamilles: d.grandesFamilles || [], familles: d.familles || [],
+      personnes: d.personnes || [], relations: d.relations || []
+    };
+  }
+  function snapshot(){ return JSON.stringify(DATA); }
+  function commit(){
+    M = Genea.build(DATA);
+    lsSet(DRAFT_KEY, snapshot());
+    updateStatus();
+  }
+  function updateStatus(){
+    var s = document.getElementById("status");
+    var dirty = snapshot() !== BASE;
+    s.className = "status " + (dirty ? "dirty" : "clean");
+    s.textContent = dirty ? "● Modifications non exportées" : "À jour";
+    document.getElementById("siteTitle").textContent = DATA.site.titre || "Plusieurs Branches, une Même Racine";
+  }
+  function toast(msg){
+    var t = document.createElement("div"); t.className = "toast"; t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function(){ t.style.opacity = "0"; }, 2200);
+    setTimeout(function(){ t.remove(); }, 2700);
+  }
+  function setData(d, asBase){
+    DATA = normalize(d);
+    if(asBase){ BASE = snapshot(); lsSet(BASE_KEY, BASE); }
+    commit(); render();
+  }
+
+  function init(){
+    var draft = lsGet(DRAFT_KEY);
+    BASE = lsGet(BASE_KEY) || "";
+    UI.loadData()
+      .then(function(file){
+        var fileStr = JSON.stringify(normalize(file));
+        if(draft && draft !== fileStr && BASE === fileStr){
+          // brouillon en cours basé sur le fichier actuel : on le reprend
+          BASE = fileStr; setData(JSON.parse(draft), false);
+          toast("Brouillon non exporté restauré");
+        }else if(draft && draft !== fileStr && confirm("Un brouillon non exporté existe dans ce navigateur.\n\nOK = reprendre le brouillon\nAnnuler = repartir du fichier family-data.json publié")){
+          BASE = fileStr; lsSet(BASE_KEY, BASE); setData(JSON.parse(draft), false);
+        }else{
+          setData(file, true);
+        }
+      })
+      .catch(function(){
+        if(draft){ setData(JSON.parse(draft), false); toast("Brouillon restauré (family-data.json non lisible)"); }
+        else { setData(Genea.emptyData(), true); toast("family-data.json non lisible : utilisez « Importer »"); }
+      });
+  }
+
+  /* ---------- Utilitaires ---------- */
+  function uid(base, taken){
+    var s = Genea.slug(base), id = s, i = 2;
+    while(taken(id)){ id = s + "-" + i; i++; }
+    return id;
+  }
+  function personTaken(id){ return !!(M && M.P[id]) || DATA.personnes.some(function(p){ return p.id === id; }); }
+  function sortedPersons(){
+    return DATA.personnes.slice().sort(function(a, b){ return name(a).localeCompare(name(b), "fr"); });
+  }
+  function personOptions(selected, filter, emptyLabel){
+    return '<option value="">' + esc(emptyLabel || "— choisir —") + '</option>' +
+      sortedPersons().filter(filter || function(){ return true; }).map(function(p){
+        return '<option value="' + esc(p.id) + '"' + (p.id === selected ? " selected" : "") + '>' + esc(name(p)) +
+          (p.anneeNaissance ? " (" + p.anneeNaissance + ")" : "") + '</option>';
+      }).join("");
+  }
+  function gfOptions(selected, emptyLabel){
+    return '<option value="">' + esc(emptyLabel || "— aucune —") + '</option>' + DATA.grandesFamilles.map(function(g){
+      return '<option value="' + esc(g.id) + '"' + (g.id === selected ? " selected" : "") + '>' + esc(g.nom) + '</option>';
+    }).join("");
+  }
+  function famOptions(selected, emptyLabel){
+    var byGf = {};
+    DATA.familles.forEach(function(f){ (byGf[f.grandeFamilleId || ""] = byGf[f.grandeFamilleId || ""] || []).push(f); });
+    return '<option value="">' + esc(emptyLabel || "— aucune / inconnue —") + '</option>' + Object.keys(byGf).map(function(g){
+      return '<optgroup label="' + esc(g && M.GF[g] ? "Grande Famille " + M.GF[g].nom : "Sans Grande Famille") + '">' + byGf[g].map(function(f){
+        return '<option value="' + esc(f.id) + '"' + (f.id === selected ? " selected" : "") + '>' + esc(f.nom) + '</option>';
+      }).join("") + '</optgroup>';
+    }).join("");
+  }
+  function relTypeOptions(sel){
+    return Object.keys(T).map(function(k){ return '<option value="' + k + '"' + (k === sel ? " selected" : "") + '>' + esc(T[k].label) + '</option>'; }).join("");
+  }
+  function relTypeLabel(type, pid){
+    var t = T[type]; if(!t) return type;
+    var p = M.P[pid], parts = t.label.split(" / ");
+    if(parts.length === 2 && p && p.sexe) return p.sexe === "M" ? parts[0] : parts[1];
+    return t.label;
+  }
+  function famDesc(f){
+    var pe = M.P[f.pereId], me = M.P[f.mereId];
+    return (pe ? name(pe) : "?") + " & " + (me ? name(me) : "?");
+  }
+
+  /* ---------- Onglets ---------- */
+  document.getElementById("tabs").addEventListener("click", function(e){
+    var b = e.target.closest("button"); if(!b) return;
+    tab = b.getAttribute("data-tab");
+    this.querySelectorAll("button").forEach(function(x){ x.classList.toggle("on", x === b); });
+    render();
+  });
+  function render(){
+    var p = document.getElementById("panel");
+    ({ personnes: renderPersons, familles: renderFamilies, grandes: renderGF, relations: renderRelations, reglages: renderSettings })[tab](p);
+  }
+
+  /* ========== PERSONNES ========== */
+  function renderPersons(el){
+    el.innerHTML =
+      '<div class="panel-head"><h2>Personnes (' + DATA.personnes.length + ')</h2><button class="btn" id="newP">+ Nouvelle personne</button></div>' +
+      '<p class="help">Chaque personne a son identité, sa famille (celle dont elle est l\'enfant) et sa Grande Famille. ' +
+      'Les liens parent/enfant et les conjoints viennent des familles ; ajoutez ici d\'autres liens (frère, cousin, oncle…) — les autres relations sont déduites automatiquement.</p>' +
+      '<div class="filters"><input type="search" id="pq" placeholder="Rechercher…" value="' + esc(ui.q) + '">' +
+      '<select id="pgf">' + gfOptions(ui.gf, "Toutes les Grandes Familles") + '</select>' +
+      '<select id="pfam">' + famOptions(ui.fam, "Toutes les familles") + '</select></div>' +
+      '<div class="plist" id="plist"></div>';
+    el.querySelector("#newP").onclick = function(){ openPerson(null, {}); };
+    el.querySelector("#pq").oninput = function(){ ui.q = this.value; drawPersonList(); };
+    el.querySelector("#pgf").onchange = function(){ ui.gf = this.value; drawPersonList(); };
+    el.querySelector("#pfam").onchange = function(){ ui.fam = this.value; drawPersonList(); };
+    drawPersonList();
+  }
+  function norm(s){ return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+  function drawPersonList(){
+    var q = norm(ui.q);
+    var list = sortedPersons().filter(function(p){
+      if(q && norm(name(p)).indexOf(q) < 0) return false;
+      if(ui.gf && M.grandeFamilleOf(p) !== ui.gf) return false;
+      if(ui.fam){
+        var f = M.F[ui.fam];
+        if(p.familleId !== ui.fam && !(f && (f.pereId === p.id || f.mereId === p.id))) return false;
+      }
+      return true;
+    });
+    var box = document.getElementById("plist");
+    box.innerHTML = list.length ? list.map(function(p){
+      var f = p.familleId && M.F[p.familleId];
+      var heads = M.familiesHeadedBy(p.id);
+      var sub = f ? "Enfant · " + f.nom : heads.length ? "Parent · " + heads.map(function(h){ return h.nom; }).join(", ") : "Aucune famille";
+      return '<button class="pitem" data-id="' + esc(p.id) + '">' + avatar(p, 42, photoPreviews[p.photo]) +
+        '<span style="min-width:0"><b>' + esc(name(p)) + (!p.sexe ? ' <span class="warn-dot" title="Sexe non précisé">●</span>' : '') + '</b>' +
+        '<small>' + esc(sub) + (p.anneeNaissance ? " · " + p.anneeNaissance : "") + '</small></span></button>';
+    }).join("") : '<p class="muted">Aucune personne.</p>';
+    box.onclick = function(e){ var b = e.target.closest(".pitem"); if(b) openPerson(b.getAttribute("data-id")); };
+  }
+
+  /* ---- Fenêtre d'édition d'une personne ----
+     preset : { familleId, grandeFamilleId, sexe, onSaved(id) } */
+  function openPerson(id, preset, useSecond){
+    preset = preset || {};
+    var dlg = document.getElementById(useSecond ? "dlg2" : "dlg");
+    var isNew = !id;
+    var p = isNew ? { id: "", prenom: "", nom: "", sexe: preset.sexe || "", moisNaissance: null, anneeNaissance: null, photo: "",
+                      familleId: preset.familleId || null, grandeFamilleId: preset.grandeFamilleId || null }
+                  : JSON.parse(JSON.stringify(M.P[id]));
+    if(isNew && p.familleId && !p.grandeFamilleId && M.F[p.familleId]) p.grandeFamilleId = M.F[p.familleId].grandeFamilleId || null;
+    // relations déclarées impliquant cette personne (copie de travail)
+    var rels = DATA.relations.filter(function(r){ return id && (r.a === id || r.b === id); }).map(function(r){ return Object.assign({}, r); });
+    var gfTouched = !!p.grandeFamilleId && !isNew;
+
+    var mois = '<option value="">—</option>' + Genea.MOIS.map(function(m, i){
+      return '<option value="' + (i + 1) + '"' + (p.moisNaissance === i + 1 ? " selected" : "") + '>' + m + '</option>'; }).join("");
+
+    dlg.innerHTML =
+      '<form method="dialog" id="pf"><div class="dlg-head"><h2>' + (isNew ? "Nouvelle personne" : esc(name(p))) + '</h2><button type="button" class="x" data-close aria-label="Fermer">×</button></div>' +
+      '<div class="dlg-body">' +
+      '<fieldset><legend>Identité</legend><div class="row c2">' +
+        '<label class="f"><span>Prénom(s) *</span><input type="text" name="prenom" required value="' + esc(p.prenom) + '"></label>' +
+        '<label class="f"><span>Nom</span><input type="text" name="nom" value="' + esc(p.nom) + '"></label></div>' +
+        '<div class="row c3" style="margin-top:.8rem"><div class="f"><span class="eyebrow" style="font-size:.64rem">Sexe</span><div class="radios">' +
+          '<label><input type="radio" name="sexe" value="M"' + (p.sexe === "M" ? " checked" : "") + '> Homme</label>' +
+          '<label><input type="radio" name="sexe" value="F"' + (p.sexe === "F" ? " checked" : "") + '> Femme</label>' +
+          '<label><input type="radio" name="sexe" value=""' + (!p.sexe ? " checked" : "") + '> ?</label></div></div>' +
+        '<label class="f"><span>Mois de naissance</span><select name="mois">' + mois + '</select></label>' +
+        '<label class="f"><span>Année de naissance</span><input type="number" name="annee" min="1800" max="2100" value="' + esc(p.anneeNaissance || "") + '"></label></div>' +
+      '</fieldset>' +
+      '<fieldset><legend>Photo</legend><div class="photo-row"><span id="pPrev">' + avatar(p, 90, photoPreviews[p.photo]) + '</span><div class="grow">' +
+        '<input type="text" name="photo" placeholder="photos/prenom-nom.jpg" value="' + esc(p.photo) + '">' +
+        '<div><label class="btn ghost small">Choisir une image…<input type="file" accept="image/*" hidden id="pFile"></label></div>' +
+        '<p class="hint">Le fichier choisi doit aussi être copié dans le dossier <b>photos/</b> du site (même nom).</p></div></div></fieldset>' +
+      '<fieldset><legend>Appartenance</legend><div class="row c2">' +
+        '<label class="f"><span>Famille (enfant de)</span><select name="familleId">' + famOptions(p.familleId) + '</select></label>' +
+        '<label class="f"><span>Grande Famille</span><select name="gf">' + gfOptions(p.grandeFamilleId) + '</select></label></div>' +
+        '<p class="hint" id="famHint"></p></fieldset>' +
+      '<fieldset><legend>Relations déclarées</legend><ul class="rel-list" id="relList"></ul>' +
+        '<div class="addrel"><span class="t">Cette personne est</span><select id="rType">' + relTypeOptions("fratrie") + '</select>' +
+        '<span class="t">de</span><select id="rOther">' + personOptions("", function(q){ return q.id !== id; }) + '</select>' +
+        '<button type="button" class="btn small" id="rAdd">Ajouter</button></div>' +
+        '<p class="hint">Inutile de déclarer les parents, enfants et conjoints déjà définis par les familles.</p></fieldset>' +
+      (isNew ? '' : '<fieldset><legend>Relations déduites (aperçu)</legend><div id="dedBox"></div></fieldset>') +
+      '</div><div class="dlg-foot"><div>' + (isNew ? '' : '<button type="button" class="btn danger small" id="pDel">Supprimer</button>') + '</div>' +
+      '<div class="r"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn" value="ok" id="pSave">Enregistrer</button></div></div></form>';
+
+    var form = dlg.querySelector("#pf");
+    function famHint(){
+      var f = M.F[form.familleId.value];
+      dlg.querySelector("#famHint").textContent = f ? "Parents : " + famDesc(f) : "";
+    }
+    famHint();
+    form.familleId.onchange = function(){
+      var f = M.F[this.value];
+      if(f && f.grandeFamilleId && !gfTouched) form.gf.value = f.grandeFamilleId;
+      famHint();
+    };
+    form.gf.onchange = function(){ gfTouched = true; };
+    function refreshPhoto(){
+      var tmp = { id: p.id || "new", prenom: form.prenom.value, nom: form.nom.value, sexe: (form.querySelector("[name=sexe]:checked") || {}).value, photo: form.photo.value };
+      dlg.querySelector("#pPrev").innerHTML = avatar(tmp, 90, photoPreviews[tmp.photo]);
+    }
+    form.photo.oninput = refreshPhoto;
+    form.prenom.oninput = refreshPhoto;
+    dlg.querySelector("#pFile").onchange = function(){
+      var f = this.files[0]; if(!f) return;
+      var path = "photos/" + f.name;
+      photoPreviews[path] = URL.createObjectURL(f);
+      form.photo.value = path; refreshPhoto();
+    };
+
+    function drawRels(){
+      var me = p.id || "__new__";
+      dlg.querySelector("#relList").innerHTML = rels.length ? rels.map(function(r, i){
+        var isA = r.a === me || (!p.id && r.a === "__new__");
+        var other = isA ? r.b : r.a;
+        var txt = isA ? "Est <b>" + esc(relTypeLabel(r.type, p.id)) + "</b> de " + esc(name(M.P[other]))
+                      : esc(name(M.P[other])) + " est <b>" + esc(relTypeLabel(r.type, other)) + "</b> de cette personne";
+        return '<li><span>' + txt + '</span><button type="button" class="btn danger small" data-i="' + i + '">Retirer</button></li>';
+      }).join("") : '<li class="muted">Aucune relation déclarée.</li>';
+    }
+    drawRels();
+    dlg.querySelector("#relList").onclick = function(e){
+      var b = e.target.closest("[data-i]"); if(!b) return;
+      rels.splice(+b.getAttribute("data-i"), 1); drawRels();
+    };
+    dlg.querySelector("#rAdd").onclick = function(){
+      var other = dlg.querySelector("#rOther").value, type = dlg.querySelector("#rType").value;
+      if(!other){ toast("Choisissez la personne liée"); return; }
+      rels.push({ a: p.id || "__new__", type: type, b: other }); drawRels();
+    };
+    if(!isNew) drawDeduced(dlg.querySelector("#dedBox"), id);
+
+    var del = dlg.querySelector("#pDel");
+    if(del) del.onclick = function(){
+      if(!confirm("Supprimer " + name(p) + " ?\nSes relations déclarées seront supprimées et il/elle sera retiré(e) des familles.")) return;
+      DATA.personnes = DATA.personnes.filter(function(q){ return q.id !== id; });
+      DATA.relations = DATA.relations.filter(function(r){ return r.a !== id && r.b !== id; });
+      DATA.familles.forEach(function(f){ if(f.pereId === id) f.pereId = null; if(f.mereId === id) f.mereId = null; });
+      dlg.close(); commit(); render(); toast("Personne supprimée");
+    };
+
+    dlg.onclose = function(){
+      if(dlg.returnValue !== "ok") return;
+      var v = {
+        prenom: form.prenom.value.trim(), nom: form.nom.value.trim(),
+        sexe: (form.querySelector("[name=sexe]:checked") || {}).value || "",
+        moisNaissance: form.mois.value ? +form.mois.value : null,
+        anneeNaissance: form.annee.value ? +form.annee.value : null,
+        photo: form.photo.value.trim(),
+        familleId: form.familleId.value || null,
+        grandeFamilleId: form.gf.value || null
+      };
+      var pid = id;
+      if(isNew){
+        pid = uid(v.prenom + " " + v.nom, personTaken);
+        DATA.personnes.push(Object.assign({ id: pid }, v));
+      }else{
+        var target = DATA.personnes.filter(function(q){ return q.id === id; })[0];
+        Object.assign(target, v);
+      }
+      // relations : on remplace celles de la personne
+      DATA.relations = DATA.relations.filter(function(r){ return r.a !== pid && r.b !== pid; })
+        .concat(rels.map(function(r){ return { a: r.a === "__new__" ? pid : r.a, type: r.type, b: r.b === "__new__" ? pid : r.b }; }));
+      commit(); render();
+      toast(isNew ? "Personne ajoutée" : "Modifications enregistrées");
+      if(preset.onSaved) preset.onSaved(pid);
+    };
+    // validation manuelle (le bouton "ok" ferme le dialog)
+    dlg.querySelector("#pSave").onclick = function(e){
+      if(!form.prenom.value.trim()){ e.preventDefault(); form.prenom.focus(); toast("Le prénom est obligatoire"); }
+    };
+    dlg.returnValue = "";
+    dlg.showModal();
+  }
+
+  function drawDeduced(box, id){
+    var rels = M.relationsOf(id);
+    if(!rels.length){ box.innerHTML = '<p class="muted">Aucune relation pour le moment.</p>'; return; }
+    var groups = {};
+    rels.forEach(function(r){ (groups[r.cat] = groups[r.cat] || []).push(r); });
+    box.innerHTML = Genea.CATEGORIES.filter(function(c){ return groups[c[0]]; }).map(function(c){
+      return '<p class="eyebrow" style="margin:.6rem 0 .3rem;font-size:.6rem">' + c[1] + '</p><ul class="ded-list">' +
+        groups[c[0]].map(function(r){
+          return '<li><b>' + esc(name(M.P[r.id])) + '</b> — ' + esc(r.label) + (r.src === "deduit" ? '<span class="badge-deduit">déduit</span>' : '') + '</li>';
+        }).join("") + '</ul>';
+    }).join("");
+  }
+
+  /* ========== FAMILLES ========== */
+  function setOrdre(f, val){
+    if(!f) return;
+    var n = parseInt(val, 10);
+    if(isNaN(n)) delete f.ordre; else f.ordre = n;
+  }
+  function renderFamilies(el){
+    el.innerHTML =
+      '<div class="panel-head"><h2>Familles (' + DATA.familles.length + ')</h2><button class="btn" id="newF">+ Nouvelle famille</button></div>' +
+      '<p class="help">Une famille = un père, une mère et leurs enfants. Elle appartient à une Grande Famille. ' +
+      'Chaque famille apparaît comme un carré sur la page d\'accueil, dans l\'ordre des <b>numéros d\'ordre</b> (1 = en premier). ' +
+      'Les familles fondatrices restent seules sur la première rangée. Une famille sans numéro est placée après les autres, dans l\'ordre de l\'arbre.</p>' +
+      '<div class="filters"><select id="fgf">' + gfOptions(ui.gf, "Toutes les Grandes Familles") + '</select>' +
+      '<button class="btn ghost small" id="renum" style="flex:0 0 auto" title="Donne les numéros 1, 2, 3… dans l\'ordre affiché">Renuméroter 1, 2, 3…</button>' +
+      '<button class="btn ghost small" id="autoOrd" style="flex:0 0 auto" title="Efface tous les numéros : retour à l\'ordre de l\'arbre">Ordre de l\'arbre</button></div>' +
+      '<div class="fgrid">' + M.orderedFamilies().filter(function(f){ return !ui.gf || f.grandeFamilleId === ui.gf; }).map(function(f){
+        var kids = M.childrenOfFamily(f.id);
+        return '<div class="fitem"><div style="display:flex;justify-content:space-between;align-items:center;gap:.6rem"><h3>' + esc(f.nom) + '</h3>' +
+          '<label class="ord" title="Numéro d\'ordre sur la page principale">N°<input type="number" min="0" step="1" data-ord="' + esc(f.id) + '" value="' + esc(f.ordre != null ? f.ordre : "") + '"></label></div>' +
+          '<span class="chip" style="align-self:flex-start">' + esc(M.GF[f.grandeFamilleId] ? M.GF[f.grandeFamilleId].nom : "Sans Grande Famille") + '</span>' +
+          '<div class="pp"><span>' + avatar(M.P[f.pereId] || { id: "x", prenom: "?" }, 34) + esc(M.P[f.pereId] ? name(M.P[f.pereId]) : "Père ?") + '</span>' +
+          '<span>' + avatar(M.P[f.mereId] || { id: "y", prenom: "?" }, 34) + esc(M.P[f.mereId] ? name(M.P[f.mereId]) : "Mère ?") + '</span></div>' +
+          '<div class="kidsline">' + kids.length + ' enfant(s)' + (kids.length ? " : " + kids.map(function(k){ return esc(M.P[k].prenom || name(M.P[k])); }).join(", ") : "") + '</div>' +
+          '<div class="btns"><button class="btn small" data-kid="' + esc(f.id) + '">+ Enfant</button>' +
+          '<button class="btn ghost small" data-edit="' + esc(f.id) + '">Modifier</button></div></div>';
+      }).join("") + '</div>' + (DATA.familles.length ? '' : '<p class="muted">Aucune famille. Créez d\'abord une Grande Famille, puis une famille.</p>');
+    el.querySelector("#newF").onclick = function(){ openFamily(null); };
+    el.querySelectorAll("[data-ord]").forEach(function(inp){
+      inp.onchange = function(){
+        var f = DATA.familles.filter(function(x){ return x.id === inp.getAttribute("data-ord"); })[0];
+        setOrdre(f, inp.value);
+        commit(); render(); toast("Ordre mis à jour");
+      };
+    });
+    el.querySelector("#renum").onclick = function(){
+      var list = M.orderedFamilies();
+      if(!confirm("Donner les numéros 1 à " + list.length + " aux familles, dans l'ordre affiché ?")) return;
+      list.forEach(function(f, i){ setOrdre(DATA.familles.filter(function(x){ return x.id === f.id; })[0], i + 1); });
+      commit(); render(); toast("Familles renumérotées");
+    };
+    el.querySelector("#autoOrd").onclick = function(){
+      if(!confirm("Effacer tous les numéros d'ordre et revenir à l'ordre de l'arbre ?")) return;
+      DATA.familles.forEach(function(f){ delete f.ordre; });
+      commit(); render(); toast("Ordre de l'arbre rétabli");
+    };
+    el.querySelector("#fgf").onchange = function(){ ui.gf = this.value; render(); };
+    el.querySelector(".fgrid").onclick = function(e){
+      var k = e.target.closest("[data-kid]"), ed = e.target.closest("[data-edit]");
+      if(k) openPerson(null, { familleId: k.getAttribute("data-kid") });
+      if(ed) openFamily(ed.getAttribute("data-edit"));
+    };
+  }
+
+  function openFamily(id){
+    var dlg = document.getElementById("dlg");
+    var isNew = !id;
+    var f = isNew ? { id: "", nom: "", grandeFamilleId: ui.gf || (DATA.grandesFamilles[0] || {}).id || null, pereId: null, mereId: null }
+                  : Object.assign({}, M.F[id]);
+    var nameTouched = !isNew;
+
+    function draw(){
+      var kids = id ? M.childrenOfFamily(id) : [];
+      dlg.innerHTML =
+        '<form method="dialog" id="ff"><div class="dlg-head"><h2>' + (isNew ? "Nouvelle famille" : esc(f.nom)) + '</h2><button type="button" class="x" data-close aria-label="Fermer">×</button></div>' +
+        '<div class="dlg-body"><div class="row c2">' +
+          '<label class="f"><span>Nom de la famille *</span><input type="text" name="nom" required value="' + esc(f.nom) + '" placeholder="Famille Paul & Marie"></label>' +
+          '<label class="f"><span>Grande Famille</span><select name="gf">' + gfOptions(f.grandeFamilleId) + '</select></label></div>' +
+        '<div class="row c2"><label class="f"><span>N° d\'ordre (page principale)</span><input type="number" name="ordre" min="0" step="1" value="' + esc(f.ordre != null ? f.ordre : "") + '" placeholder="vide = ordre de l\'arbre"></label><span></span></div>' +
+        '<div class="row c2">' +
+          '<label class="f"><span>Père</span><div class="sel-add"><select name="pere">' + personOptions(f.pereId, function(p){ return p.sexe !== "F"; }, "— inconnu —") + '</select>' +
+            '<button type="button" class="btn ghost small" id="newPere" title="Créer une nouvelle personne">+</button></div></label>' +
+          '<label class="f"><span>Mère</span><div class="sel-add"><select name="mere">' + personOptions(f.mereId, function(p){ return p.sexe !== "M"; }, "— inconnue —") + '</select>' +
+            '<button type="button" class="btn ghost small" id="newMere" title="Créer une nouvelle personne">+</button></div></label></div>' +
+        (isNew ? '<p class="hint">Enregistrez la famille, puis ajoutez-y les enfants.</p>' :
+          '<fieldset><legend>Enfants (' + kids.length + ')</legend><ul class="rel-list">' + (kids.length ? kids.map(function(k){
+            return '<li><span style="display:flex;align-items:center;gap:.5rem">' + avatar(M.P[k], 30, photoPreviews[M.P[k].photo]) + esc(name(M.P[k])) +
+              (M.P[k].anneeNaissance ? ' <span class="muted">(' + M.P[k].anneeNaissance + ')</span>' : '') + '</span>' +
+              '<button type="button" class="btn ghost small" data-p="' + esc(k) + '">Modifier</button></li>';
+          }).join("") : '<li class="muted">Aucun enfant.</li>') + '</ul>' +
+          '<p style="margin:.7rem 0 0"><button type="button" class="btn small" id="addKid">+ Ajouter un enfant</button></p></fieldset>') +
+        '</div><div class="dlg-foot"><div>' + (isNew ? '' : '<button type="button" class="btn danger small" id="fDel">Supprimer</button>') + '</div>' +
+        '<div class="r"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn" value="ok" id="fSave">Enregistrer</button></div></div></form>';
+
+      var form = dlg.querySelector("#ff");
+      function autoName(){
+        if(nameTouched) return;
+        var pe = M.P[form.pere.value], me = M.P[form.mere.value];
+        var parts = [pe && (pe.prenom || "").split(" ")[0], me && (me.prenom || "").split(" ")[0]].filter(Boolean);
+        if(parts.length) form.nom.value = "Famille " + parts.join(" & ");
+      }
+      form.nom.oninput = function(){ nameTouched = true; };
+      form.pere.onchange = autoName; form.mere.onchange = autoName;
+      function keep(){ var o = parseInt(form.ordre.value, 10); f.ordre = isNaN(o) ? undefined : o; f.nom = form.nom.value; f.grandeFamilleId = form.gf.value || null; f.pereId = form.pere.value || null; f.mereId = form.mere.value || null; }
+      dlg.querySelector("#newPere").onclick = function(){
+        keep(); openPerson(null, { sexe: "M", grandeFamilleId: f.grandeFamilleId, onSaved: function(pid){ f.pereId = pid; draw(); autoNameAfter(); } }, true);
+      };
+      dlg.querySelector("#newMere").onclick = function(){
+        keep(); openPerson(null, { sexe: "F", grandeFamilleId: f.grandeFamilleId, onSaved: function(pid){ f.mereId = pid; draw(); autoNameAfter(); } }, true);
+      };
+      function autoNameAfter(){ var fm = dlg.querySelector("#ff"); if(fm && !nameTouched){ fm.pere.dispatchEvent(new Event("change")); } }
+      var ak = dlg.querySelector("#addKid");
+      if(ak) ak.onclick = function(){ keep(); saveFamily(form, true); openPerson(null, { familleId: id, onSaved: function(){ draw(); } }, true); };
+      dlg.querySelectorAll("[data-p]").forEach(function(b){
+        b.onclick = function(){ keep(); openPerson(b.getAttribute("data-p"), { onSaved: function(){ draw(); } }, true); };
+      });
+      var del = dlg.querySelector("#fDel");
+      if(del) del.onclick = function(){
+        if(!confirm("Supprimer la famille « " + f.nom + " » ?\nLes personnes sont conservées ; les enfants n'auront plus de famille d'origine.")) return;
+        DATA.familles = DATA.familles.filter(function(x){ return x.id !== id; });
+        DATA.personnes.forEach(function(p){ if(p.familleId === id) p.familleId = null; });
+        dlg.onclose = null; dlg.close(); commit(); render(); toast("Famille supprimée");
+      };
+      dlg.querySelector("#fSave").onclick = function(e){
+        if(!form.nom.value.trim()){ e.preventDefault(); form.nom.focus(); toast("Le nom est obligatoire"); return; }
+        if(form.pere.value && form.pere.value === form.mere.value){ e.preventDefault(); toast("Le père et la mère doivent être différents"); }
+      };
+      dlg.onclose = function(){ if(dlg.returnValue === "ok") { saveFamily(form, false); } };
+    }
+
+    function saveFamily(form, silent){
+      var v = { nom: form.nom.value.trim() || f.nom || "Famille", grandeFamilleId: form.gf.value || null, pereId: form.pere.value || null, mereId: form.mere.value || null };
+      var ord = parseInt(form.ordre.value, 10);
+      v.ordre = isNaN(ord) ? undefined : ord;
+      if(!id){
+        id = uid(v.nom, function(x){ return DATA.familles.some(function(q){ return q.id === x; }); });
+        DATA.familles.push(Object.assign({ id: id }, v));
+        isNew = false;
+      }else{
+        Object.assign(DATA.familles.filter(function(q){ return q.id === id; })[0], v);
+      }
+      f = Object.assign({ id: id }, v);
+      commit();
+      if(!silent){ render(); toast("Famille enregistrée"); }
+    }
+    draw();
+    dlg.returnValue = "";
+    dlg.showModal();
+  }
+
+  /* ========== GRANDES FAMILLES ========== */
+  function renderGF(el){
+    el.innerHTML =
+      '<div class="panel-head"><h2>Grandes Familles (' + DATA.grandesFamilles.length + ')</h2><button class="btn" id="newG">+ Nouvelle Grande Famille</button></div>' +
+      '<p class="help">Une Grande Famille regroupe plusieurs familles et possède son propre arbre généalogique sur le site.</p>' +
+      '<table><thead><tr><th>Nom</th><th>Description</th><th>Familles</th><th>Personnes</th><th></th></tr></thead><tbody>' +
+      DATA.grandesFamilles.map(function(g){
+        var nf = DATA.familles.filter(function(f){ return f.grandeFamilleId === g.id; }).length;
+        var np = DATA.personnes.filter(function(p){ return M.grandeFamilleOf(p) === g.id; }).length;
+        return '<tr><td><b>' + esc(g.nom) + '</b></td><td class="muted">' + esc(g.description || "") + '</td><td>' + nf + '</td><td>' + np + '</td>' +
+          '<td style="text-align:right;white-space:nowrap"><a class="btn ghost small" href="index.html?apercu=1#/grande-famille/' + encodeURIComponent(g.id) + '" target="_blank">Arbre</a> ' +
+          '<button class="btn ghost small" data-g="' + esc(g.id) + '">Modifier</button></td></tr>';
+      }).join("") + '</tbody></table>' + (DATA.grandesFamilles.length ? '' : '<p class="muted">Aucune Grande Famille.</p>');
+    el.querySelector("#newG").onclick = function(){ openGF(null); };
+    el.querySelector("tbody").onclick = function(e){ var b = e.target.closest("[data-g]"); if(b) openGF(b.getAttribute("data-g")); };
+  }
+  function openGF(id){
+    var dlg = document.getElementById("dlg");
+    var g = id ? Object.assign({}, M.GF[id]) : { nom: "", description: "" };
+    dlg.innerHTML = '<form method="dialog" id="gf"><div class="dlg-head"><h2>' + (id ? esc(g.nom) : "Nouvelle Grande Famille") + '</h2><button type="button" class="x" data-close aria-label="Fermer">×</button></div>' +
+      '<div class="dlg-body"><label class="f"><span>Nom *</span><input type="text" name="nom" required value="' + esc(g.nom) + '" placeholder="Jouenang"></label>' +
+      '<label class="f"><span>Description</span><textarea name="desc" rows="3">' + esc(g.description || "") + '</textarea></label></div>' +
+      '<div class="dlg-foot"><div>' + (id ? '<button type="button" class="btn danger small" id="gDel">Supprimer</button>' : '') + '</div>' +
+      '<div class="r"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn" value="ok" id="gSave">Enregistrer</button></div></div></form>';
+    var form = dlg.querySelector("#gf");
+    dlg.querySelector("#gSave").onclick = function(e){ if(!form.nom.value.trim()){ e.preventDefault(); toast("Le nom est obligatoire"); } };
+    var del = dlg.querySelector("#gDel");
+    if(del) del.onclick = function(){
+      if(!confirm("Supprimer la Grande Famille « " + g.nom + " » ?\nLes familles et personnes sont conservées, sans Grande Famille.")) return;
+      DATA.grandesFamilles = DATA.grandesFamilles.filter(function(x){ return x.id !== id; });
+      DATA.familles.forEach(function(f){ if(f.grandeFamilleId === id) f.grandeFamilleId = null; });
+      DATA.personnes.forEach(function(p){ if(p.grandeFamilleId === id) p.grandeFamilleId = null; });
+      dlg.onclose = null; dlg.close(); commit(); render();
+    };
+    dlg.onclose = function(){
+      if(dlg.returnValue !== "ok") return;
+      var v = { nom: form.nom.value.trim(), description: form.desc.value.trim() };
+      if(id) Object.assign(DATA.grandesFamilles.filter(function(x){ return x.id === id; })[0], v);
+      else DATA.grandesFamilles.push(Object.assign({ id: uid(v.nom, function(x){ return DATA.grandesFamilles.some(function(q){ return q.id === x; }); }) }, v));
+      commit(); render(); toast("Grande Famille enregistrée");
+    };
+    dlg.returnValue = ""; dlg.showModal();
+  }
+
+  /* ========== RELATIONS ========== */
+  function renderRelations(el){
+    var rows = DATA.relations.map(function(r, i){
+      var a = M.P[r.a], b = M.P[r.b];
+      return '<tr><td>' + (a ? esc(name(a)) : '<i>?</i>') + '</td><td>est <b>' + esc(relTypeLabel(r.type, r.a)) + '</b> de</td><td>' + (b ? esc(name(b)) : '<i>?</i>') + '</td>' +
+        '<td style="text-align:right"><button class="btn danger small" data-del="' + i + '">Supprimer</button></td></tr>';
+    }).join("");
+    el.innerHTML =
+      '<div class="panel-head"><h2>Relations déclarées (' + DATA.relations.length + ')</h2></div>' +
+      '<p class="help">Déclarez ici les liens qui ne découlent pas déjà des familles. Le site en déduit automatiquement les autres : ' +
+      'fratrie transitive, grands-parents, oncles/tantes, neveux, cousins (y compris via les frères et sœurs), beaux-parents, beaux-frères/belles-sœurs, gendres…</p>' +
+      '<div class="addrel"><select id="ra">' + personOptions("") + '</select><span class="t">est</span><select id="rt">' + relTypeOptions("fratrie") + '</select>' +
+      '<span class="t">de</span><select id="rb">' + personOptions("") + '</select></div>' +
+      '<p><button class="btn small" id="radd">Ajouter la relation</button></p>' +
+      (rows ? '<table><tbody>' + rows + '</tbody></table>' : '<p class="muted">Aucune relation déclarée pour le moment (les familles suffisent souvent).</p>') +
+      '<h2 style="font-family:var(--font-display);font-weight:600;font-size:1.2rem;margin:2rem 0 .6rem">Vérifier les déductions</h2>' +
+      '<select id="chk" style="max-width:420px">' + personOptions("", null, "— choisir une personne —") + '</select><div id="chkOut" style="margin-top:.8rem"></div>' +
+      '<h2 style="font-family:var(--font-display);font-weight:600;font-size:1.2rem;margin:2rem 0 .6rem">Contrôles de cohérence</h2><ul class="issues">' + issues() + '</ul>';
+    el.querySelector("#radd").onclick = function(){
+      var a = el.querySelector("#ra").value, b = el.querySelector("#rb").value, t = el.querySelector("#rt").value;
+      if(!a || !b){ toast("Choisissez les deux personnes"); return; }
+      if(a === b){ toast("Choisissez deux personnes différentes"); return; }
+      if(DATA.relations.some(function(r){ return r.a === a && r.b === b && r.type === t; })){ toast("Relation déjà présente"); return; }
+      DATA.relations.push({ a: a, type: t, b: b }); commit(); render(); toast("Relation ajoutée");
+    };
+    el.querySelector("tbody") && (el.querySelector("tbody").onclick = function(e){
+      var b = e.target.closest("[data-del]"); if(!b) return;
+      DATA.relations.splice(+b.getAttribute("data-del"), 1); commit(); render();
+    });
+    el.querySelector("#chk").onchange = function(){ if(this.value) drawDeduced(el.querySelector("#chkOut"), this.value); else el.querySelector("#chkOut").innerHTML = ""; };
+  }
+  function issues(){
+    var out = [];
+    DATA.personnes.forEach(function(p){
+      if(!p.sexe) out.push(name(p) + " : sexe non précisé (les libellés seront au masculin/féminin).");
+      if(!M.grandeFamilleOf(p)) out.push(name(p) + " : aucune Grande Famille.");
+      if(p.familleId && !M.F[p.familleId]) out.push(name(p) + " : famille inexistante.");
+      var f = p.familleId && M.F[p.familleId];
+      if(f && (f.pereId === p.id || f.mereId === p.id)) out.push(name(p) + " est à la fois parent et enfant de « " + f.nom + " ».");
+    });
+    DATA.familles.forEach(function(f){
+      if(M.P[f.pereId] && M.P[f.pereId].sexe === "F") out.push("« " + f.nom + " » : le père est enregistré comme femme.");
+      if(M.P[f.mereId] && M.P[f.mereId].sexe === "M") out.push("« " + f.nom + " » : la mère est enregistrée comme homme.");
+      if(!f.grandeFamilleId) out.push("« " + f.nom + " » n'appartient à aucune Grande Famille.");
+    });
+    // cycles : une personne ne peut être son propre ancêtre
+    DATA.personnes.forEach(function(p){
+      var seen = {}, stack = (M.parentsOf[p.id] || []).slice();
+      while(stack.length){
+        var q = stack.pop(); if(seen[q]) continue; seen[q] = 1;
+        if(q === p.id){ out.push(name(p) + " apparaît comme son propre ancêtre (vérifiez les familles)."); break; }
+        stack = stack.concat(M.parentsOf[q] || []);
+      }
+    });
+    if(!out.length) return '<li class="ok">Aucun problème détecté.</li>';
+    var more = out.length > 40 ? '<li>… et ' + (out.length - 40) + ' autre(s).</li>' : '';
+    return out.slice(0, 40).map(function(s){ return '<li>' + esc(s) + '</li>'; }).join("") + more;
+  }
+
+  /* ========== RÉGLAGES & DONNÉES ========== */
+  function renderSettings(el){
+    el.innerHTML =
+      '<div class="panel-head"><h2>Réglages du site</h2></div>' +
+      '<div class="row c2"><label class="f"><span>Titre de la page principale</span><input type="text" id="st" value="' + esc(DATA.site.titre) + '"></label>' +
+      '<label class="f"><span>Sous-titre</span><input type="text" id="ss" value="' + esc(DATA.site.sousTitre || "") + '"></label></div>' +
+      '<p><button class="btn small" id="sSave">Enregistrer les réglages</button></p>' +
+      '<div class="panel-head" style="margin-top:2rem"><h2>Publier les modifications</h2></div>' +
+      '<ol class="help" style="line-height:1.7"><li>Cliquez sur <b>⬇ Exporter les données</b> (en haut à droite).</li>' +
+      '<li>Remplacez les fichiers <b>family-data.json</b> et <b>family-data.js</b> du site par ceux téléchargés (si le navigateur le demande, autorisez les téléchargements multiples).</li>' +
+      '<li>Copiez les nouvelles photos dans le dossier <b>photos/</b>.</li>' +
+      '<li>Publiez le dossier (ou rechargez la page si le site tourne en local).</li></ol>' +
+      '<p class="help">Vos modifications sont aussi conservées automatiquement dans ce navigateur (brouillon) tant qu\'elles ne sont pas exportées.</p>' +
+      '<p style="display:flex;gap:.5rem;flex-wrap:wrap"><button class="btn ghost small" id="reload">Abandonner le brouillon et recharger family-data.json</button>' +
+      '<button class="btn danger small" id="blank">Repartir d\'un fichier vide</button></p>' +
+      '<p class="help" style="margin-top:1.5rem">' + DATA.grandesFamilles.length + ' Grande(s) Famille(s) · ' + DATA.familles.length + ' familles · ' +
+      DATA.personnes.length + ' personnes · ' + DATA.relations.length + ' relations déclarées.</p>';
+    el.querySelector("#sSave").onclick = function(){
+      DATA.site.titre = el.querySelector("#st").value.trim() || "Plusieurs Branches, une Même Racine";
+      DATA.site.sousTitre = el.querySelector("#ss").value.trim();
+      commit(); toast("Réglages enregistrés");
+    };
+    el.querySelector("#reload").onclick = function(){
+      if(!confirm("Abandonner toutes les modifications non exportées ?")) return;
+      try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
+      UI.loadData()
+        .then(function(d){ setData(d, true); toast("Fichier rechargé"); })
+        .catch(function(){ toast("Impossible de lire family-data.json — utilisez « Importer »"); });
+    };
+    el.querySelector("#blank").onclick = function(){
+      if(!confirm("Effacer toutes les données du brouillon ? (le fichier family-data.json n'est pas modifié)")) return;
+      setData(Genea.emptyData(), false);
+    };
+  }
+
+  /* ---------- Import / export ---------- */
+  document.getElementById("exportBtn").onclick = function(){
+    function dl(content, fname, type){
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([content], { type: type })); a.download = fname;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+    }
+    dl(JSON.stringify(DATA, null, 2), "family-data.json", "application/json");
+    setTimeout(function(){ dl(UI.dataToJs(DATA), "family-data.js", "text/javascript"); }, 400);
+    BASE = snapshot(); lsSet(BASE_KEY, BASE); updateStatus();
+    toast("2 fichiers téléchargés (family-data.json et family-data.js) — remplacez les anciens");
+  };
+  document.getElementById("importFile").onchange = function(){
+    var f = this.files[0]; if(!f) return;
+    var r = new FileReader();
+    r.onload = function(){
+      try{ var d = JSON.parse(r.result); setData(d, true); toast("Fichier importé"); }
+      catch(e){ alert("Fichier JSON invalide : " + e.message); }
+    };
+    r.readAsText(f); this.value = "";
+  };
+  window.addEventListener("beforeunload", function(e){
+    if(snapshot() !== BASE){ e.preventDefault(); e.returnValue = ""; }
+  });
+
+  document.addEventListener("click", function(e){
+    var c = e.target.closest("[data-close]");
+    if(c){ var d = c.closest("dialog"); if(d) d.close("cancel"); }
+  });
+  init();
+})();
+</script>
+</body>
+</html>
