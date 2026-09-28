@@ -1059,7 +1059,7 @@ var UI = (function(){
       dlg.innerHTML =
         '<form method="dialog" id="ff"><div class="dlg-head"><h2>' + (isNew ? "Nouvelle famille" : esc(f.nom)) + '</h2><button type="button" class="x" data-close aria-label="Fermer">×</button></div>' +
         '<div class="dlg-body"><div class="row c2">' +
-          '<label class="f"><span>Nom de la famille *</span><input type="text" name="nom" required value="' + esc(f.nom) + '" placeholder="Famille Paul & Marie"></label>' +
+          '<label class="f"><span>Nom de la famille *</span><input type="text" name="nom" required value="' + esc(f.nom) + '" placeholder="Famille Ngantcha (nom de l\'époux)"></label>' +
           '<label class="f"><span>Grande Famille</span><select name="gf">' + gfOptions(f.grandeFamilleId) + '</select></label></div>' +
         '<div class="row c2"><label class="f"><span>N° d\'ordre (page principale)</span><input type="number" name="ordre" min="0" step="1" value="' + esc(f.ordre != null ? f.ordre : "") + '" placeholder="vide = ordre de l\'arbre"></label><span></span></div>' +
         '<div class="row c2">' +
@@ -1081,8 +1081,9 @@ var UI = (function(){
       function autoName(){
         if(nameTouched) return;
         var pe = M.P[form.pere.value], me = M.P[form.mere.value];
-        var parts = [pe && (pe.prenom || "").split(" ")[0], me && (me.prenom || "").split(" ")[0]].filter(Boolean);
-        if(parts.length) form.nom.value = "Famille " + parts.join(" & ");
+        // nom de famille de l'époux ; à défaut, celui de l'épouse
+        var nom = (pe && pe.nom) || (me && me.nom) || (pe && pe.prenom) || (me && me.prenom) || "";
+        if(nom) form.nom.value = "Famille " + nom.trim();
       }
       form.nom.oninput = function(){ nameTouched = true; };
       form.pere.onchange = autoName; form.mere.onchange = autoName;

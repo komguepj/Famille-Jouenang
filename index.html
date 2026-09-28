@@ -92,6 +92,9 @@ a.parent:hover{background:rgba(255,243,214,.07)}
 .parent .role{font-family:var(--font-label);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sage-light)}
 .parent .name{font-family:var(--font-display);font-weight:600;font-size:.95rem;line-height:1.2}
 .parent.unknown{opacity:.55}
+.solo{display:flex;justify-content:center;padding:.4rem 0}
+.solo .parent .name{font-size:1.05rem}
+.family-page .solo{margin-bottom:1.5rem}
 .kids{border-top:1px dashed var(--line);padding-top:.7rem}
 .kids h3{margin:0 0 .45rem;font-family:var(--font-label);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-light);font-weight:400}
 .kids ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.15rem}
@@ -778,6 +781,17 @@ var UI = (function(){
       '<span class="role">' + role + '</span><span class="name">' + esc(name(p)) + '</span></a>';
   }
 
+  // Couple : si un seul parent est renseigné (famille d'une personne seule),
+  // on n'affiche que cette personne, sans case « époux / épouse » vide.
+  function coupleHtml(f, extra){
+    var hasP = !!M.P[f.pereId], hasM = !!M.P[f.mereId];
+    if(hasP && hasM) return '<div class="couple' + (extra || "") + '">' + parentBlock(f.pereId, "Père") + '<span class="heart">♥</span>' + parentBlock(f.mereId, "Mère") + '</div>';
+    if(!hasP && !hasM) return "";
+    var id = hasP ? f.pereId : f.mereId, p = M.P[id];
+    return '<div class="solo' + (extra || "") + '"><a class="parent" href="#/personne/' + encodeURIComponent(id) + '">' + avatar(p, 96) +
+      '<span class="name">' + esc(name(p)) + '</span>' + (Genea.birthText(p) ? '<span class="role">' + esc(Genea.birthText(p)) + '</span>' : '') + '</a></div>';
+  }
+
   function familyCard(f){
     var kids = M.childrenOfFamily(f.id);
     var list = kids.length ? '<ul>' + kids.map(function(k){
@@ -786,13 +800,13 @@ var UI = (function(){
       return '<li><a href="#/personne/' + encodeURIComponent(k) + '">' + avatar(p, 30) + '<span>' + esc(name(p)) +
         (hasFam ? ' <span class="plus" title="A fondé sa propre famille">●</span>' : '') + '</span>' +
         '<span class="yr">' + esc(yearOf(p)) + '</span></a></li>';
-    }).join("") + '</ul>' : '<p class="none">Aucun enfant enregistré.</p>';
+    }).join("") + '</ul>' : '';
     return '<article class="fcard" id="f-' + esc(f.id) + '">' +
       '<div class="fcard-head"><h2><a href="#/famille/' + encodeURIComponent(f.id) + '">' + esc(f.nom) + '</a></h2>' +
       (f.grandeFamilleId && M.GF[f.grandeFamilleId] ? '<a class="chip" href="#/grande-famille/' + encodeURIComponent(f.grandeFamilleId) + '" title="Voir l\'arbre">' + esc(gfName(f.grandeFamilleId)) + '</a>' : '') +
       '</div>' +
-      '<div class="couple">' + parentBlock(f.pereId, "Père") + '<span class="heart">♥</span>' + parentBlock(f.mereId, "Mère") + '</div>' +
-      '<div class="kids"><h3>Enfants (' + kids.length + ')</h3>' + list + '</div></article>';
+      coupleHtml(f) +
+      (kids.length ? '<div class="kids"><h3>Enfants (' + kids.length + ')</h3>' + list + '</div>' : '') + '</article>';
   }
 
   /* ---------- Page d'accueil ---------- */
@@ -858,12 +872,11 @@ var UI = (function(){
       (f.grandeFamilleId && M.GF[f.grandeFamilleId] ? '<a class="btn" href="#/grande-famille/' + encodeURIComponent(f.grandeFamilleId) + '">Voir l\'arbre généalogique</a>' : '') +
       origins.map(function(o){ return '<a class="btn ghost" href="#/famille/' + encodeURIComponent(o.id) + '">↑ ' + esc(o.nom) + '</a>'; }).join("") +
       '</div></header>' +
-      '<section class="family-page"><div class="couple">' + parentBlock(f.pereId, "Père") + '<span class="heart">♥</span>' + parentBlock(f.mereId, "Mère") + '</div>' +
-      '<h2 class="section-title">Enfants (' + kids.length + ')</h2>' +
-      (kids.length ? '<div class="kid-grid">' + kids.map(function(k){
+      '<section class="family-page">' + coupleHtml(f) +
+      (kids.length ? '<h2 class="section-title">Enfants (' + kids.length + ')</h2><div class="kid-grid">' + kids.map(function(k){
         var p = M.P[k];
         return '<a href="#/personne/' + encodeURIComponent(k) + '">' + avatar(p, 72) + '<b>' + esc(name(p)) + '</b><small>' + esc(Genea.birthText(p) || "") + '</small></a>';
-      }).join("") + '</div>' : '<p class="empty">Aucun enfant enregistré.</p>') +
+      }).join("") + '</div>' : '') +
       '</section>' + footer();
   }
 
